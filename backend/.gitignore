@@ -1,0 +1,66 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+static/
+
+# If you collect static files with collectstatic:
+static_root/
+
+# Environment variables
+.env
+.env.*
+
+# VS Code settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# Python virtual environment
+venv/
+env/
+ENV/
+
+# macOS files
+.DS_Store
+
+# coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# mypy
+.mypy_cache/
+
+# pytest cache
+.pytest_cache/
+
+# Django migrations
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# celery beat schedule file
+celerybeat-schedule
+
+# local config files
+local_settings.py
+
+# logs
+logs/
+
+# debug files
+*.pyo
+*.pyd
+
+# Ju
+/env
