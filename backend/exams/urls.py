@@ -8,5 +8,5 @@ router.register(r'options',OptionViewSet)
 router.register(r'exams',ExamViewSet)
 router.register(r'examquestions',ExamQuestionviewSet)
 router.register(r'questionswithoptions', QuestionWithOptionsViewSet, basename='questionswithoptions')
-
+router.register(r"examinvitations", ExamInvitationViewSet, basename="examinvitations")
 urlpatterns = router.urls

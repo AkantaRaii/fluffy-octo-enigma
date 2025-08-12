@@ -8,7 +8,7 @@ class UserExamAttempt(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)
     is_submitted = models.BooleanField(default=False)
-    ip_address = models.GenericIPAddressField(blank=True, null=True)  # For security
+    ip_address = models.GenericIPAddressField(blank=True, null=True) 
     def calculate_score(self):
         responses = self.responses.filter(
             option__is_correct=True

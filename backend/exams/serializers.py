@@ -20,11 +20,11 @@ class OptionSerializers(serializers.ModelSerializer):
         model=Option
         fields='__all__'
         read_only_fields = ['question']
-class ExamSerializers(serializers.Serializer):
+class ExamSerializers(serializers.ModelSerializer):
     class Meta:
         model=Exam
         fields='__all__'
-        read_only_fields=['creator','']
+        read_only_fields=['creator']
 class ExamQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model=ExamQuestion
@@ -51,3 +51,27 @@ class QuestionWithOptionsSerializers(serializers.ModelSerializer):
         for option_data in options_data:
             Option.objects.create(question=question, **option_data)
         return question
+    
+from rest_framework import serializers
+from .models import ExamInvitation
+
+class ExamInvitationSerializer(serializers.ModelSerializer):
+    exam_title = serializers.CharField(source="exam.title", read_only=True)
+    user_email = serializers.EmailField(source="user.email", read_only=True)
+
+    class Meta:
+        model = ExamInvitation
+        fields = [
+            "id",
+            "exam",
+            "exam_title",
+            "user",
+            "user_email",
+            "sent_at",
+            "added_by",
+            "token",
+            "is_attempted",
+        ]
+        read_only_fields = ["sent_at", "token","added_by"]
+
+        

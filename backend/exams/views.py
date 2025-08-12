@@ -3,6 +3,7 @@ from rest_framework import viewsets,permissions,filters
 from .models import *
 from .serializers import *
 from django.db import transaction
+import uuid
 # Create your views here.
 class SubjectViewSet(viewsets.ModelViewSet):
     queryset=Subject.objects.all()
@@ -44,3 +45,12 @@ class QuestionWithOptionsViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+
+
+class ExamInvitationViewSet(viewsets.ModelViewSet):
+    queryset = ExamInvitation.objects.all()
+    serializer_class = ExamInvitationSerializer
+
+    def perform_create(self, serializer):
+        # Auto-generate token on creation
+        serializer.save(token=str(uuid.uuid4()),added_by=self.request.user)
