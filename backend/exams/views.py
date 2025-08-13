@@ -9,14 +9,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from results_and_attempts.models import UserExamAttempt
+from django_filters.rest_framework import DjangoFilterBackend
 # Create your views here.
-class SubjectViewSet(viewsets.ModelViewSet):
-    queryset=Subject.objects.all()
-    serializer_class=SubjectSerializers
+class DepartmentViewSet(viewsets.ModelViewSet):
+    queryset=Department.objects.all()
+    serializer_class=DepartmentSerializers
     # permission_classes=[permissions.IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset=Question.objects.all()
     serializer_class=QuestionSerializers
@@ -25,8 +24,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
     search_fields=['text']
     ordering_fields=['marks','created_at']
 
-    def perform_create(self,serializer):
-        serializer.save(created_by=self.request.user)
 class OptionViewSet(viewsets.ModelViewSet):
     queryset=Option.objects.all()
     serializer_class=OptionSerializers
@@ -44,13 +41,10 @@ class ExamQuestionviewSet(viewsets.ModelViewSet):
     serializer_class=ExamQuestionSerializer
 
 class QuestionWithOptionsViewSet(viewsets.ModelViewSet):
-    queryset = Question.objects.all()
+    queryset = Question.objects.all()   
     serializer_class = QuestionWithOptionsSerializers
-
-    @transaction.atomic
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
-
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['departments','departments__name']
 
 class ExamInvitationViewSet(viewsets.ModelViewSet):
     queryset = ExamInvitation.objects.all()

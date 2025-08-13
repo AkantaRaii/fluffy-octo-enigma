@@ -2,11 +2,9 @@ from django.db import models
 from users.models import User
 from datetime import timedelta
 
-class Subject(models.Model):
-    name = models.CharField(max_length=100)  # e.g., "Behavioral Skills"
+class Department(models.Model):
+    name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-
     def __str__(self):
         return self.name
 
@@ -17,7 +15,7 @@ class Question(models.Model):
         ('MCQ_MULTI', 'Multiple Correct Answers'),
         ('SHORT_ANSWER', 'Short Answer'),
     ]
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    departments = models.ManyToManyField(Department, related_name="questions")
     type = models.CharField(
         max_length=20,
         choices=QUESTION_TYPES,
@@ -27,9 +25,6 @@ class Question(models.Model):
     marks = models.PositiveIntegerField(default=1)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('subject', 'text',)
     def __str__(self):
         return f"{(self.text[:50])}... ({self.get_type_display()})"
 
@@ -43,7 +38,7 @@ class Option(models.Model):
         return f"Option: {(self.text[:20])} (Correct: {self.is_correct})"
 class Exam(models.Model):
     title = models.CharField(max_length=200)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     duration_minutes = models.PositiveIntegerField()
     scheduled_start = models.DateTimeField()
