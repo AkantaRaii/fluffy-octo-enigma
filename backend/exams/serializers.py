@@ -75,3 +75,19 @@ class ExamInvitationSerializer(serializers.ModelSerializer):
         read_only_fields = ["sent_at", "token","added_by"]
 
         
+
+
+
+# yo chai exam ko bela correct options njaos vanera matra 
+class OptionSafeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Option
+        fields = ['id', 'text']  # No is_correct
+
+class QuestionWithSafeOptionsSerializer(serializers.ModelSerializer):
+    options = OptionSafeSerializer(many=True)
+    subject_name = serializers.CharField(source='subject.name', read_only=True)
+
+    class Meta:
+        model = Question
+        fields = ['id', 'subject', 'type', 'text', 'marks', 'options', 'subject_name']

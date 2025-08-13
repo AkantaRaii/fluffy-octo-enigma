@@ -23,5 +23,6 @@ class UserResponse(models.Model):
     attempt = models.ForeignKey(UserExamAttempt, on_delete=models.CASCADE, related_name='responses')
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     option = models.ForeignKey(Option, on_delete=models.CASCADE, null=True, blank=True)
-    text_answer = models.TextField(blank=True)  # For short answers
+    text_answer = models.TextField(blank=True)
     responded_at = models.DateTimeField(auto_now_add=True)
+    is_correct = models.BooleanField(default=False) 

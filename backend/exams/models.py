@@ -72,7 +72,7 @@ class ExamQuestion(models.Model):
     weight = models.FloatField(default=1.0)  # Score multiplier
     total_questions = models.PositiveIntegerField(default=20)
     class Meta:
-        ordering = ['order']
+        ordering = ['order']    
 
 class ExamInvitation(models.Model):
     """Tracks who gets which exam (for groups/individuals)."""
@@ -85,3 +85,5 @@ class ExamInvitation(models.Model):
 
     class Meta:
         unique_together = ('exam', 'user')
+
+
