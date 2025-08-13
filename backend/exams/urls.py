@@ -3,7 +3,7 @@ from .views import *
 from django.urls import include, path
 
 router = DefaultRouter()
-router.register(r'subjects', SubjectViewSet)
+router.register(r'departments', DepartmentViewSet)
 router.register(r'questions', QuestionViewSet)
 router.register(r'options',OptionViewSet)
 router.register(r'exams',ExamViewSet)
