@@ -10,6 +10,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from results_and_attempts.models import UserExamAttempt
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action
+from .serializers import ExamSerializers
+from .services import (
+    assign_random_questions_to_exam,
+    invite_department_users_for_exam,
+)
 # Create your views here.
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset=Department.objects.all()
@@ -33,8 +39,79 @@ class ExamViewSet(viewsets.ModelViewSet):
     filter_backends=[filters.SearchFilter,filters.OrderingFilter]
     search_fields=['title','instructions']
     ordering_fields=['scheduled_start','duration_minutes']
-    def perform_create(self,serializer):
+    def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
+
+    @action(detail=True, methods=["post"], url_path="auto-assign-questions")
+    def auto_assign_questions(self, request, pk=None):
+        """
+        POST /exams/{id}/auto-assign-questions/
+        Body:
+        {
+          "number_of_questions": 20,
+          "clear_existing": false,
+          "strict": false,
+          "weight": 1.0
+        }
+        """
+        exam = self.get_object()
+        try:
+            num = int(request.data.get("number_of_questions", 0))
+        except (TypeError, ValueError):
+            return Response({"detail": "number_of_questions must be an integer."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if num <= 0:
+            return Response({"detail": "number_of_questions must be > 0."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        clear_existing = bool(request.data.get("clear_existing", False))
+        strict = bool(request.data.get("strict", False))
+        weight = float(request.data.get("weight", 1.0))
+
+        try:
+            with transaction.atomic():
+                assigned, available = assign_random_questions_to_exam(
+                    exam=exam,
+                    count=num,
+                    clear_existing=clear_existing,
+                    strict=strict,
+                    weight=weight,
+                )
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "exam_id": exam.id,
+            "requested": num,
+            "assigned": assigned,
+            "available_in_department": available,
+            "cleared_existing": clear_existing,
+            "strict": strict
+        }, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], url_path="auto-invite-department-users")
+    def auto_invite_department_users(self, request, pk=None):
+        """
+        POST /exams/{id}/auto-invite-department-users/
+        Body:
+        {
+          "include_existing": false
+        }
+        """
+        exam = self.get_object()
+        include_existing = bool(request.data.get("include_existing", False))
+
+        created, skipped = invite_department_users_for_exam(
+            exam=exam,
+            added_by=request.user,
+            include_existing=include_existing
+        )
+        return Response({
+            "exam_id": exam.id,
+            "invited_count": created,
+            "skipped_existing": skipped,
+            "include_existing": include_existing
+        }, status=status.HTTP_200_OK)
 class ExamQuestionviewSet(viewsets.ModelViewSet):
 
     queryset=ExamQuestion.objects.all()
