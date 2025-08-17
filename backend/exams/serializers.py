@@ -46,9 +46,11 @@ class OptionSerializers(serializers.ModelSerializer):
         fields='__all__'
         read_only_fields = ['question']
 class ExamSerializers(serializers.ModelSerializer):
+    creator_email=serializers.EmailField(source='creator.email',read_only=True)
+    department_name=serializers.CharField(source='department.name',read_only=True)
     class Meta:
         model=Exam
-        fields='__all__'
+        fields=['id','title','department','department_name','creator','creator_email','duration_minutes','scheduled_start','scheduled_end','repeat_after_days','is_active','instructions','celery_task_id','passing_score']
         read_only_fields=['creator']
 class ExamQuestionSerializer(serializers.ModelSerializer):
     class Meta:

@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 export const fetchClient = async <T = any>(
   url: string,
   options: AxiosRequestConfig = {}
-): Promise<T> => {
+): Promise<AxiosResponse<T>> => {
   const { data: session } = useSession();
 
   const headers = {
@@ -20,5 +20,5 @@ export const fetchClient = async <T = any>(
     headers,
   });
 
-  return response.data;
+  return response;
 };

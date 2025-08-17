@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 async function refreshToken(token: any) {
   if (token && token.refreshToken) {
     const res = await fetch(
-      `${process.env.BASE_URL}/api/v1/auth/token/refresh/`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/token/refresh/`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,13 +29,17 @@ export const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "email", type: "email", placeholder: "jsmith@example.com" },
+        email: {
+          label: "email",
+          type: "email",
+          placeholder: "jsmith@example.com",
+        },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         try {
           const res = await axios.post(
-            `${process.env.BASE_URL}/api/v1/auth/token/`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/token/`,
             {
               email: credentials?.email,
               password: credentials?.password,
@@ -49,6 +53,7 @@ export const authOptions = {
               email: data.user.email,
               accessToken: data.access,
               refreshToken: data.refresh,
+              role: data.user.role,
             };
           } else {
             return null; // Return null if no data is received
@@ -86,6 +91,7 @@ export const authOptions = {
           refreshToken: user.refreshToken,
           id: user.id,
           email: user.email,
+          role: user.role,
         };
       }
       if (Date.now() < token.accessTokenExpires) {
@@ -97,9 +103,9 @@ export const authOptions = {
       if (token) {
         session.accessToken = token.accessToken || "";
         session.refreshToken = token.refreshToken || "";
-        session.username = token.username;
         session.id = token.id;
         session.email = token.email;
+        session.role = token.role;
       }
       return session;
     },

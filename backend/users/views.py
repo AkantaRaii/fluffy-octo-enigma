@@ -15,6 +15,7 @@ class Me(APIView):
         user=User.objects.get(id=user.id)
         response = {
             'email': user.email,
+            'role':user.role,
         }
         return Response(response, status=200)
 

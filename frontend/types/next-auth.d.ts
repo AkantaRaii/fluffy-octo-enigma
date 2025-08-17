@@ -7,6 +7,6 @@ declare module "next-auth" {
     refreshToken?: string;
     id?: string | number;
     email?: string;
-    username?: string;
+    role?: "ADMIN" | "ANALYZER" | "USER";
   }
 }

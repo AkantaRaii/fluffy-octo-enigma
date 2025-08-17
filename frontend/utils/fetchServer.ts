@@ -4,10 +4,11 @@ import { auth } from "@/app/api/auth/[...nextauth]/route";
 export const fetchServer = async <T = any>(
   url: string,
   options: AxiosRequestConfig = {}
-): Promise<T> => {
+): Promise<AxiosResponse<T>> => {
   const session = await auth();
 
   const headers = {
+    "Content-Type": "application/json",
     ...options.headers,
     ...(session && { Authorization: `Bearer ${session.accessToken}` }),
   };
@@ -18,5 +19,5 @@ export const fetchServer = async <T = any>(
     headers,
   });
 
-  return response.data;
+  return response;
 };

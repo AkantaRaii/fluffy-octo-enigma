@@ -6,7 +6,10 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff } from "lucide-react";
+import { useSession } from "next-auth/react";
+
 export default function InputField() {
+  const { data: session } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -18,21 +21,18 @@ export default function InputField() {
       redirect: false,
       email,
       password,
-      callbackUrl: "/application/dashboard",
+      callbackUrl: "/",
     });
-    toast.dismiss(loadingToastId);
     if (response?.ok) {
-      toast.success("Login successful");
-      router.push("/application/dashboard");
+      router.push("/");
     } else {
-      toast.error("Login failed");
     }
   };
 
   return (
     <>
       <form onSubmit={submitHandler}>
-        <div className=" h-[500px] my-22 sm:mx-12 md:mx-15 mx-2 flex flex-col items-center p-4">
+        <div className=" h-[500px] my-22 sm:mx-12  md:mx-15 mx-2 flex flex-col items-center p-4">
           <h1 className="text-primaryText font-bold text-3xl m-2">
             Welcome Back!
           </h1>
@@ -107,7 +107,7 @@ export default function InputField() {
               <span className="text-warningAction underline">Sign up</span>
             </Link>
           </div>
-        </div>w
+        </div>
       </form>
     </>
   );
