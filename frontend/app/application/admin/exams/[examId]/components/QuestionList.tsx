@@ -1,4 +1,5 @@
 import BigQuestionCard from "@/components/BigQuestionCard";
+import ExpandableQuestionCard from "@/components/ExpandibleQuestionCard";
 import { Question } from "@/types/QuestionOption";
 
 interface Props {
@@ -20,7 +21,7 @@ export default function QuestionList({
         <p className="text-gray-500 text-sm">No questions available.</p>
       ) : (
         questions.map((q) => (
-          <BigQuestionCard
+          <ExpandableQuestionCard
             key={q.id}
             question={q}
             button={

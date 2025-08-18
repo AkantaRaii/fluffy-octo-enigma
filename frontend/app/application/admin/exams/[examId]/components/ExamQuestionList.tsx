@@ -1,7 +1,7 @@
 // components/ExamQuestionList.tsx
 "use client";
 
-import SmallQuestionCard from "@/components/smallQuestionCard";
+import ExpandableQuestionCard from "@/components/ExpandibleQuestionCard";
 import { ExamQuestion } from "@/types/QuestionOption";
 
 interface Props {
@@ -13,7 +13,7 @@ export default function ExamQuestionList({ questions, onRemove }: Props) {
   return (
     <div className="space-y-2">
       {questions.map((q) => (
-        <SmallQuestionCard
+        <ExpandableQuestionCard
           key={q.id}
           question={q.question}
           button={

@@ -18,6 +18,11 @@ export default function ManageQuestionPage({
   exam,
   departments,
 }: Props) {
+  const [selectedDepartment, setSelectedDepartment] =
+    useState<Department | null>(
+      departments.find((department) => department.id === exam.department) ||
+        null
+    );
   const [departmentQuestions, setDepartmentQuestions] = useState<Question[]>(
     []
   );
@@ -28,7 +33,7 @@ export default function ManageQuestionPage({
     const fetchQuestions = async () => {
       try {
         const departmentRes = await apiClient.get(
-          `/api/v1/exams/questionswithoptions/?departments=1`
+          `/api/v1/exams/questionswithoptions/?departments=${selectedDepartment?.id}`
         );
         setDepartmentQuestions(departmentRes.data);
       } catch (error) {
@@ -37,7 +42,7 @@ export default function ManageQuestionPage({
     };
 
     fetchQuestions();
-  }, []);
+  }, [selectedDepartment]);
 
   // 👇 Filter out questions already added to exam
   const availableQuestions = useMemo(() => {
@@ -87,10 +92,35 @@ export default function ManageQuestionPage({
 
       <div className="grid grid-cols-12 gap-6">
         {/* Left: All Department Questions */}
-        <div className="col-span-7 bg-white shadow-md rounded-xl p-4 h-[600px] overflow-y-auto">
-          <div>
+        <div className="col-span-7 bg-white shadow-md rounded-xl p-4 h-[600px] overflow-y-auto relative">
+          <div className=" sticky top-0 flex flex-row justify-between">
             <h3 className="text-lg font-semibold mb-4">All Questions</h3>
+            <div>
+              {" "}
+              <select
+                value={selectedDepartment?.id || "all"}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "all") {
+                    setSelectedDepartment(null);
+                  } else {
+                    const dept =
+                      departments.find((d) => d.id === Number(val)) || null;
+                    setSelectedDepartment(dept);
+                  }
+                }}
+                className="border rounded px-2 py-1 text-sm"
+              >
+                <option value="all">All Departments</option>
+                {departments.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </option>
+                ))}
+              </select>
             </div>
+          </div>
+
           <QuestionList
             questions={availableQuestions}
             onAdd={handleAddQuestion}
