@@ -5,15 +5,16 @@ import { Plus, X } from "lucide-react";
 import { useState } from "react";
 import { Department } from "@/types/Depertment";
 import AddExam from "./components/AddExam";
-import SessionWrapper from "@/components/SessionWrapper";
-import ExamForm from "./components/ExamForm";
+import EditExam from "./components/EditExam";
 interface Props {
   examList: Exam[];
   departments: Department[];
 }
 export default function ExamBody({ examList, departments }: Props) {
   const [addExamForm, setAddExamForm] = useState(false);
+  const [editExamForm, setEditExamForm] = useState(false);
   const [exams, setExams] = useState<Exam[]>(examList);
+  const [currentExam, setCurrentExam] = useState<Exam | null>(null);
 
   return (
     <>
@@ -27,10 +28,18 @@ export default function ExamBody({ examList, departments }: Props) {
           <p>Add Exam</p>
         </div>
       </div>
-      <Table data={exams} />
+      <Table data={exams} setEditExamForm={setEditExamForm} setCurrentExam={setCurrentExam} setExams={setExams}/>
       {addExamForm && (
         <AddExam
           setAddExamForm={setAddExamForm}
+          setExams={setExams}
+          departments={departments}
+        />
+      )}
+      {editExamForm && currentExam && (
+        <EditExam
+          exam={currentExam}
+          setEditExamForm={setEditExamForm}
           setExams={setExams}
           departments={departments}
         />

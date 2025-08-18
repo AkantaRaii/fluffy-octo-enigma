@@ -2,6 +2,7 @@
 "use client";
 
 import Layout from "@/components/Layout";
+import { ModalProvider } from "@/context/ModalContext";
 import { Home, Clock, History, User as UserIcon } from "lucide-react";
 
 export default function UserLayout({
@@ -34,7 +35,7 @@ export default function UserLayout({
       menuItems={menuItems}
       rightSlot={<div className="text-sm opacity-70">student@you</div>}
     >
-      {children}
+      <ModalProvider>{children}</ModalProvider>
     </Layout>
   );
 }

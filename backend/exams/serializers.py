@@ -52,10 +52,7 @@ class ExamSerializers(serializers.ModelSerializer):
         model=Exam
         fields=['id','title','department','department_name','creator','creator_email','duration_minutes','scheduled_start','scheduled_end','repeat_after_days','is_active','instructions','celery_task_id','passing_score']
         read_only_fields=['creator']
-class ExamQuestionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=ExamQuestion
-        fields='__all__'
+
 
 
 class OptionNestedSerializer(serializers.ModelSerializer):
@@ -89,6 +86,15 @@ class QuestionWithOptionsSerializers(serializers.ModelSerializer):
         return question
 
     
+class ExamQuestionSerializer(serializers.ModelSerializer):
+    question = QuestionWithOptionsSerializers(read_only=True)
+    question_id = serializers.PrimaryKeyRelatedField(
+        queryset=Question.objects.all(), write_only=True, source='question'
+    )
+
+    class Meta:
+        model = ExamQuestion
+        fields = '__all__'
 from rest_framework import serializers
 from .models import ExamInvitation
 

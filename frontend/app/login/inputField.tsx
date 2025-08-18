@@ -15,7 +15,6 @@ export default function InputField() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
-    const loadingToastId = toast.loading("requesting");
     e.preventDefault();
     const response = await signIn("credentials", {
       redirect: false,

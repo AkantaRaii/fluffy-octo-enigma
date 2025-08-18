@@ -113,9 +113,10 @@ class ExamViewSet(viewsets.ModelViewSet):
             "include_existing": include_existing
         }, status=status.HTTP_200_OK)
 class ExamQuestionviewSet(viewsets.ModelViewSet):
-
     queryset=ExamQuestion.objects.all()
     serializer_class=ExamQuestionSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['exam']
 
 class QuestionWithOptionsViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()   
@@ -126,6 +127,8 @@ class QuestionWithOptionsViewSet(viewsets.ModelViewSet):
 class ExamInvitationViewSet(viewsets.ModelViewSet):
     queryset = ExamInvitation.objects.all()
     serializer_class = ExamInvitationSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['exam']
 
     def perform_create(self, serializer):
         # Auto-generate token on creation

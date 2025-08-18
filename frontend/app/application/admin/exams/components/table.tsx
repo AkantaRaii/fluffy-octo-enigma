@@ -1,11 +1,32 @@
 import React from "react";
 import { Exam } from "@/types/Exam";
 import { format } from "date-fns";
+import { useModal } from "@/context/ModalContext";
+import apiClient from "@/utils/axiosClient";
+import { useRouter } from "next/navigation";
 interface TableProps {
   data: Exam[];
+  setEditExamForm: (value: boolean) => void;
+  setCurrentExam: (value: Exam) => void;
+  setExams: React.Dispatch<React.SetStateAction<Exam[]>>;
 }
 
-export default function Table({ data }: TableProps) {
+export default function Table({
+  data,
+  setEditExamForm,
+  setCurrentExam,
+  setExams,
+}: TableProps) {
+  const router = useRouter();
+  const { showDeleteModal } = useModal();
+  const handleDelete = async (row: Exam) => {
+    try {
+      await apiClient.delete(`/api/v1/exams/exams/${row.id}/`);
+      setExams((prev) => prev.filter((exam) => exam.id !== row.id));
+    } catch (err) {
+      console.error("Delete failed", err);
+    }
+  };
   return (
     <div className="overflow-x-auto border-gray-200 border-1 rounded-xl">
       <table className="min-w-full border-collapse">
@@ -18,14 +39,16 @@ export default function Table({ data }: TableProps) {
             <th className="py-3 px-4">Status</th>
             <th className="py-3 px-4">Created By</th>
             <th className="py-3 px-4">Passing Marks</th>
+            <th className="py-3 px-4">Action</th>
             <th className="py-3 px-4"></th>
           </tr>
         </thead>
         <tbody className="text-sm">
           {data.map((row) => (
             <tr
+              onClick={() => router.push(`/application/admin/exams/${row.id}`)}
               key={row.id}
-              className="border-b border-gray-300 last:border-b-0 hover:bg-gray-50 transition "
+              className="border-b border-gray-300 last:border-b-0 hover:bg-gray-200 hover:cursor-pointer transition "
             >
               <td className="py-3 px-4">{row.title}</td>
               <td className="py-3 px-4">{row.department_name}</td>
@@ -33,9 +56,14 @@ export default function Table({ data }: TableProps) {
                 {format(new Date(row.scheduled_start), "yyyy-MM-dd HH:mm")}
               </td>
               <td className="py-3 px-4">
-                {row.repeat_after_days != null
-                  ? `Repeats after${row.repeat_after_days}`
-                  : "Once"}
+                {row.repeat_after_days != null ? (
+                  <>
+                    Repeats every <br />
+                    {row.repeat_after_days} days
+                  </>
+                ) : (
+                  "Once"
+                )}
               </td>
 
               <td className="py-3 px-4">
@@ -51,6 +79,32 @@ export default function Table({ data }: TableProps) {
               </td>
               <td className="py-3 px-4">{row.creator_email}</td>
               <td className="py-3 px-4">{row.passing_score}</td>
+              <td className="py-3 px-4 text-gray-500 cursor-pointer">
+                <div className="flex flex-row gap-2">
+                  <div
+                    className="bg-theme hover:cursor-pointer text-white px-2 py-1 text-center rounded-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditExamForm(true);
+                      setCurrentExam(row);
+                    }}
+                  >
+                    Edit
+                  </div>
+                  <div
+                    className="bg-red-500 hover:cursor-pointer text-white px-2 py-1 text-center rounded-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      showDeleteModal(
+                        () => handleDelete(row),
+                        `Delete exam "${row.title}"?`
+                      );
+                    }}
+                  >
+                    Delete
+                  </div>
+                </div>
+              </td>
               <td className="py-3 px-4 text-gray-500 cursor-pointer">⋮</td>
             </tr>
           ))}

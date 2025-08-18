@@ -2,6 +2,7 @@
 "use client";
 
 import Layout from "@/components/Layout";
+import { ModalProvider } from "@/context/ModalContext";
 import { Home, Users, FileQuestion, ClipboardList, Send } from "lucide-react";
 
 export default function AdminLayout({
@@ -44,7 +45,7 @@ export default function AdminLayout({
       menuItems={menuItems}
       rightSlot={<div className="text-sm opacity-70"></div>}
     >
-      {children}
+      <ModalProvider>{children}</ModalProvider>
     </Layout>
   );
 }

@@ -2,6 +2,7 @@
 import { useState, FormEvent } from "react";
 import { Department } from "@/types/Depertment";
 import { Exam } from "@/types/Exam";
+import { toLocalInputValue } from "@/utils/date";
 
 interface ExamFormProps {
   initialData?: Partial<Exam>;
@@ -16,6 +17,7 @@ export default function ExamForm({
   onSubmit,
   onCancel,
 }: ExamFormProps) {
+  console.log(initialData);
   const [title, setTitle] = useState(initialData.title ?? "");
   const [duration, setDuration] = useState(initialData.duration_minutes ?? 60);
   const [start, setStart] = useState(initialData.scheduled_start ?? "");
@@ -26,7 +28,9 @@ export default function ExamForm({
   const [repeatAfterDays, setRepeatAfterDays] = useState<string | null>(
     initialData.repeat_after_days?.toString() ?? null
   );
-  const [instruction, setInstruction] = useState(initialData.instructions ?? "");
+  const [instruction, setInstruction] = useState(
+    initialData.instructions ?? ""
+  );
   const [passingScore, setPassingScore] = useState(
     initialData.passing_score ?? 60
   );
@@ -104,7 +108,7 @@ export default function ExamForm({
           Scheduled Start
         </label>
         <input
-          value={start}
+          value={toLocalInputValue(start)}
           onChange={(e) => setStart(e.target.value)}
           type="datetime-local"
           className="mt-1 w-full border border-gray-300 rounded-lg p-2"
@@ -116,7 +120,7 @@ export default function ExamForm({
           Scheduled End
         </label>
         <input
-          value={end}
+          value={toLocalInputValue(end)}
           onChange={(e) => setEnd(e.target.value)}
           type="datetime-local"
           className="mt-1 w-full border border-gray-300 rounded-lg p-2"

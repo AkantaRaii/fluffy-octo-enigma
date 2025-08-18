@@ -8,34 +8,36 @@ import apiClient from "@/utils/axiosClient";
 import ExamForm from "./ExamForm";
 
 interface Props {
-  setAddExamForm: (value: boolean) => void;
+  exam: Exam;
+  setEditExamForm: (value: boolean) => void;
   setExams: Dispatch<SetStateAction<Exam[]>>;
   departments: Department[];
 }
 
-export default function AddExam({
-  setAddExamForm,
+export default function EditExam({
+  exam,
+  setEditExamForm,
   setExams,
   departments,
 }: Props) {
-  async function handleAdd(payload: any) {
-    const res = await apiClient.post("/api/v1/exams/exams/", payload);
-    setExams((prev) => [...prev, res.data]);
-    setAddExamForm(false);
+  async function handleEdit(payload: any) {
+    const res = await apiClient.put(`/api/v1/exams/exams/${exam.id}/`, payload);
+    setExams((prev) => prev.map((e) => (e.id === exam.id ? res.data : e)));
+    setEditExamForm(false);
   }
 
   return (
     <>
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-        onClick={() => setAddExamForm(false)}
+        onClick={() => setEditExamForm(false)}
       ></div>
 
       <div className="fixed right-0 top-0 w-full max-w-md bg-cleanWhite h-full shadow-lg z-50 animate-slideIn flex flex-col">
         <div className="flex justify-between items-center p-4 border-b bg-cleanWhite z-10">
-          <h2 className="text-md font-semibold text-primaryText">Add Exam</h2>
+          <h2 className="text-md font-semibold text-primaryText">Edit Exam</h2>
           <button
-            onClick={() => setAddExamForm(false)}
+            onClick={() => setEditExamForm(false)}
             className="p-2 rounded-md bg-gray-500"
           >
             <X className="text-white" width={14} height={14} />
@@ -44,9 +46,10 @@ export default function AddExam({
 
         <div className="flex-1 overflow-y-auto px-6 py-4">
           <ExamForm
+            initialData={exam}
             departments={departments}
-            onSubmit={handleAdd}
-            onCancel={() => setAddExamForm(false)}
+            onSubmit={handleEdit}
+            onCancel={() => setEditExamForm(false)}
           />
         </div>
       </div>

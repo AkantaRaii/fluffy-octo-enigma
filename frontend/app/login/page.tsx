@@ -2,6 +2,7 @@ import { fetchServer } from "@/utils/fetchServer";
 import InputField from "./inputField";
 import { redirect } from "next/navigation";
 import { auth } from "@/app/api/auth/[...nextauth]/route";
+import apiServer from "@/utils/axiosServer";
 interface MeApiData {
   email: string;
   role: string;
@@ -9,17 +10,17 @@ interface MeApiData {
 export default async function Login() {
   const session = await auth();
   if (session) {
-    const res = await fetchServer(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/me/`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data: MeApiData = res.data;
-    console.log(data);
-    if (res.status === 200) {
-      if (data.role === "ADMIN") return redirect("/application/admin");
-      if (data.role === "USER") return redirect("/application/user");
+    try {
+      const res = await apiServer.get(`/api/v1/auth/me/`);
+      const data: MeApiData = res.data;
+
+      if (res.status === 200) {
+        if (data.role === "ADMIN") return redirect("/application/admin");
+        if (data.role === "USER") return redirect("/application/user");
+      }
+    } catch (err: any) {
+      // if 401 or other error → just fall through to render content
+      console.error("auth/me failed", err?.response?.status);
     }
   }
   return (

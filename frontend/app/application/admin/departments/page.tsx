@@ -29,7 +29,7 @@ export default async function () {
 
   return (
     <div className="">
-      <h1 className="text-3xl font-semibold ">Departments</h1>
+      <h1 className="text-xl font-semibold ">Departments</h1>
       {/* {departments.map((department) => (
         <li key={department.id}>{department.name}</li>
       ))} */}

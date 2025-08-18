@@ -55,7 +55,7 @@ export default function Layout({
             onMenuClick={() => setOpen(true)}
             rightSlot={session?.email}
           />
-          <main className="p-4">{children}</main>
+          <main className="p-2">{children}</main>
         </div>
       </div>
     </SessionWrapper>
