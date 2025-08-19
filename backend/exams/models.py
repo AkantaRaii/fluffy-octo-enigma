@@ -1,6 +1,8 @@
 from django.db import models
 from users.models import User
 from datetime import timedelta
+from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 class Department(models.Model):
     name = models.CharField(max_length=100)
@@ -51,7 +53,16 @@ class Exam(models.Model):
     instructions = models.TextField(blank=True)
     celery_task_id = models.CharField(max_length=255, blank=True, null=True)
     passing_score = models.PositiveIntegerField(default=60)
+    def clean(self):
+        now = timezone.now()
+        if self.scheduled_start < now:
+            self.is_active = False  # auto-deactivate past exams
+        if self.scheduled_end <= self.scheduled_start:
+            raise ValidationError("Scheduled end must be after scheduled start")
 
+    def save(self, *args, **kwargs):
+        self.full_clean()  # calls clean() and field validation
+        super().save(*args, **kwargs)
     def __str__(self):
         return f"{self.title} ({self.scheduled_start.date()})"
     def next_occurrence(self):

@@ -4,7 +4,10 @@ export interface Option {
   is_correct: boolean;
   question: number;
 }
-
+export interface NewOption {
+  text: string;
+  is_correct: boolean; // keep it boolean in the form
+}
 export interface Question {
   id: number;
   departments: number[];

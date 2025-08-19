@@ -3,7 +3,10 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface ModalContextType {
-  showDeleteModal: (onConfirm: () => void, message?: string) => void;
+  showModal: (
+    onConfirm: () => void,
+    options?: { message?: string; title?: string; confirmLabel?: string }
+  ) => void;
   closeModal: () => void;
 }
 
@@ -17,24 +20,39 @@ export const useModal = () => {
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
-  const [message, setMessage] = useState("Are you sure you want to delete this?");
+  const [confirmAction, setConfirmAction] = useState<() => void>(
+    () => () => {}
+  );
+  const [message, setMessage] = useState("Are you sure?");
+  const [title, setTitle] = useState("Confirmation");
+  const [confirmLabel, setConfirmLabel] = useState("Confirm");
 
-  const showDeleteModal = (onConfirm: () => void, msg?: string) => {
+  const showModal = (
+    onConfirm: () => void,
+    options?: { message?: string; title?: string; confirmLabel?: string }
+  ) => {
     setConfirmAction(() => onConfirm);
-    if (msg) setMessage(msg);
+    if (options?.message) setMessage(options.message);
+    if (options?.title) setTitle(options.title);
+    if (options?.confirmLabel) setConfirmLabel(options.confirmLabel);
     setIsOpen(true);
   };
 
   const closeModal = () => setIsOpen(false);
 
   return (
-    <ModalContext.Provider value={{ showDeleteModal, closeModal }}>
+    <ModalContext.Provider value={{ showModal, closeModal }}>
       {children}
       {isOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-          <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900">Delete Confirmation</h2>
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/40 z-50"
+          onClick={closeModal} // close when clicking backdrop
+        >
+          <div
+            className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6"
+            onClick={(e) => e.stopPropagation()} // prevent close when clicking inside
+          >
+            <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
             <p className="text-sm text-gray-600 mt-2">{message}</p>
 
             <div className="flex justify-end gap-3 mt-6">
@@ -51,7 +69,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                 }}
                 className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
               >
-                Delete
+                {confirmLabel}
               </button>
             </div>
           </div>

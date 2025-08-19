@@ -1,6 +1,7 @@
 import BigQuestionCard from "@/components/BigQuestionCard";
 import ExpandableQuestionCard from "@/components/ExpandibleQuestionCard";
 import { Question } from "@/types/QuestionOption";
+import { CirclePlus } from "lucide-react";
 
 interface Props {
   questions: Question[];
@@ -30,10 +31,9 @@ export default function QuestionList({
                   e.stopPropagation();
                   onAdd(q);
                 }}
-                className="bg-theme hover:bg-midTheme py-1 px-2 rounded-md 
-                           text-white transform hover:scale-105 cursor-pointer"
+                className="hover:cursor-pointer text-gray-500 hover:bg-white hover:text-gray-600 text-center rounded-full p-2"
               >
-                Add
+                <CirclePlus />
               </button>
             }
           />

@@ -50,6 +50,7 @@ export default function EditExam({
             departments={departments}
             onSubmit={handleEdit}
             onCancel={() => setEditExamForm(false)}
+            isAdd={false}
           />
         </div>
       </div>

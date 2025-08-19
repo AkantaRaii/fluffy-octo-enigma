@@ -31,9 +31,9 @@ export default async function page({ params }: Props) {
 
   //jsx
   return (
-    <div className=" max-w-7xl mx-auto ">
+    <div className=" max-w-7xl ">
       {/* Exam Info Card */}
-      <div className="px-4 mb-4">
+      <div className=" mb-4">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Exam: <span className="text-theme">{exam.title}</span>
         </h1>
@@ -68,7 +68,11 @@ export default async function page({ params }: Props) {
       </div>
 
       {/* Management Sections */}
-      <Body examQuestions={examQuestions} exam={exam} departments={departments} />
+      <Body
+        examQuestions={examQuestions}
+        exam={exam}
+        departments={departments}
+      />
     </div>
   );
 }

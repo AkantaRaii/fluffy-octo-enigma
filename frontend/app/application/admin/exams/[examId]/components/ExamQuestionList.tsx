@@ -3,6 +3,7 @@
 
 import ExpandableQuestionCard from "@/components/ExpandibleQuestionCard";
 import { ExamQuestion } from "@/types/QuestionOption";
+import { CircleMinus } from "lucide-react";
 
 interface Props {
   questions: ExamQuestion[];
@@ -22,10 +23,9 @@ export default function ExamQuestionList({ questions, onRemove }: Props) {
                 e.stopPropagation();
                 onRemove(q.question.id);
               }}
-              className="bg-red-700 hover:bg-red-800 py-1 px-2 rounded-md 
-                         transform hover:scale-105 cursor-pointer text-white"
+              className="hover:cursor-pointer text-gray-500 hover:bg-white hover:text-gray-600 text-center rounded-full p-2"
             >
-              Remove
+              <CircleMinus />
             </button>
           }
         />

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import ManageUserPage from "./ManageUserPage";
 import ManageQuestionPage from "./ManageQuestionPage";
-import { ExamQuestion, Question } from "@/types/QuestionOption";
+import { ExamQuestion } from "@/types/QuestionOption";
 import { Exam } from "@/types/Exam";
 import { Department } from "@/types/Depertment";
 interface Props {
@@ -14,12 +14,11 @@ export default function Body({ examQuestions, exam, departments }: Props) {
   const [activeTab, setActiveTab] = useState<"users" | "questions">("users");
 
   return (
-    <div className=" w-full ">
+    <div className=" w-full pt-2">
       {/* Tab Bar / Segmented Control */}
 
-      <div className="grid grid-cols-3">
-        <div className="col-span-1"></div>
-        <div className="flex w-full mb-2 rounded-lg border border-gray-200 bg-gray-300 p-1  col-span-1">
+      <div className="flex justify-between">
+        <div className="flex mb-2 rounded-lg border border-gray-200 bg-gray-300 p-1 ">
           <button
             onClick={() => setActiveTab("users")}
             className={`flex-1 px-4  rounded-md text-sm font-medium transition hover:cursor-pointer
@@ -33,7 +32,7 @@ export default function Body({ examQuestions, exam, departments }: Props) {
           </button>
           <button
             onClick={() => setActiveTab("questions")}
-            className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition hover:cursor-pointer
+            className={`flex-1 px-4 rounded-md text-sm font-medium transition hover:cursor-pointer
               ${
                 activeTab === "questions"
                   ? "bg-white text-gray-800 shadow"
@@ -42,16 +41,19 @@ export default function Body({ examQuestions, exam, departments }: Props) {
           >
             Manage Questions
           </button>
-          <div className="col-span-1"></div>
         </div>
       </div>
 
       {/* Content */}
       <div className="p-2">
-        {activeTab === "users" && <ManageUserPage />}
         {activeTab === "questions" && (
-          <ManageQuestionPage examQuestions={examQuestions} exam={exam} departments={departments} />
+          <ManageQuestionPage
+            examQuestions={examQuestions}
+            exam={exam}
+            departments={departments}
+          />
         )}
+        {activeTab === "users" && <ManageUserPage />}
       </div>
     </div>
   );

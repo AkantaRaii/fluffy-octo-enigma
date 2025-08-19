@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { useModal } from "@/context/ModalContext";
 import apiClient from "@/utils/axiosClient";
 import { useRouter } from "next/navigation";
+import { FilePenLine, Trash } from "lucide-react";
 interface TableProps {
   data: Exam[];
   setEditExamForm: (value: boolean) => void;
@@ -18,7 +19,7 @@ export default function Table({
   setExams,
 }: TableProps) {
   const router = useRouter();
-  const { showDeleteModal } = useModal();
+  const { showModal } = useModal();
   const handleDelete = async (row: Exam) => {
     try {
       await apiClient.delete(`/api/v1/exams/exams/${row.id}/`);
@@ -82,26 +83,27 @@ export default function Table({
               <td className="py-3 px-4 text-gray-500 cursor-pointer">
                 <div className="flex flex-row gap-2">
                   <div
-                    className="bg-theme hover:cursor-pointer text-white px-2 py-1 text-center rounded-sm"
+                    className="hover:cursor-pointer text-gray-500 hover:bg-white hover:text-gray-600 text-center rounded-full p-2"
                     onClick={(e) => {
                       e.stopPropagation();
                       setEditExamForm(true);
                       setCurrentExam(row);
                     }}
                   >
-                    Edit
+                    <FilePenLine width={18} height={18} />
                   </div>
                   <div
-                    className="bg-red-500 hover:cursor-pointer text-white px-2 py-1 text-center rounded-sm"
+                    className=" hover:cursor-pointer text-gray-500 hover:bg-white hover:text-gray-600 text-center rounded-full p-2"
                     onClick={(e) => {
                       e.stopPropagation();
-                      showDeleteModal(
-                        () => handleDelete(row),
-                        `Delete exam "${row.title}"?`
-                      );
+                      showModal(() => handleDelete(row), {
+                        title: "Delete Confirmation",
+                        message: "Are you sure you want to delete this item?",
+                        confirmLabel: "Delete",
+                      });
                     }}
                   >
-                    Delete
+                    <Trash width={18} height={18} />
                   </div>
                 </div>
               </td>

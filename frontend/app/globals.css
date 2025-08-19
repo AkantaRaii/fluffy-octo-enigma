@@ -17,6 +17,11 @@
   --color-sideBar: #171717;
   --color-cleanWhite: #ffffff;
   --color-greyBorder: #d1d5db;
+
+  --color-gtn: #8aa624;
+  --color-pbackground: #dbe4c9;
+  --color-plight: #dbe4c9;
+  --color-contrast: #fea405;
 }
 :root {
   --background: #ffffff;

@@ -117,6 +117,32 @@ class ExamQuestionviewSet(viewsets.ModelViewSet):
     serializer_class=ExamQuestionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['exam']
+    @action(detail=False, methods=["post"], url_path="bulk_create")
+    def bulk_create(self, request):
+        """
+        Create exam-questions in bulk for all questions of a given department.
+        """
+        exam_id = request.data.get("exam_id")
+        department_id = request.data.get("department_id")
+        print(exam_id,department_id)
+        if not exam_id or not department_id:
+            return Response(
+                {"error": "exam_id and department_id are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # get all questions in the department
+        questions = Question.objects.filter(departments__id=department_id)
+
+        exam_questions = []
+        for q in questions:
+            eq, created = ExamQuestion.objects.get_or_create(
+                exam_id=exam_id, question=q
+            )
+            exam_questions.append(eq)
+
+        serializer = self.get_serializer(exam_questions, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class QuestionWithOptionsViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()   
@@ -124,15 +150,80 @@ class QuestionWithOptionsViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['departments','departments__name']
 
+
+
 class ExamInvitationViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet to manage ExamInvitation objects:
+    - list, retrieve, create, update, delete
+    - add all users from a department
+    - delete all users from an exam
+    """
     queryset = ExamInvitation.objects.all()
     serializer_class = ExamInvitationSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['exam']
 
     def perform_create(self, serializer):
-        # Auto-generate token on creation
-        serializer.save(token=str(uuid.uuid4()),added_by=self.request.user)
+        # Auto-generate token using UUID and set added_by
+        serializer.save(token=str(uuid.uuid4()), added_by=self.request.user)
+
+    @action(detail=False, methods=["post"], url_path="add-department-users")
+    def add_department_users(self, request):
+        """
+        Add all users from a department to an exam.
+        Request body:
+        {
+            "exam": 1,
+            "department": 2
+        }
+        """
+        exam_id = request.data.get("exam")
+        department_id = request.data.get("department")
+        added_by = self.request.user
+
+        if not exam_id or not department_id:
+            return Response({"error": "exam and department are required"}, status=400)
+
+        # Get users in department not already added to this exam
+        users_to_add = User.objects.filter(
+            department_id=department_id
+        ).exclude(
+            invitated_to__exam_id=exam_id
+        )
+
+        invitations = [
+            ExamInvitation(
+                exam_id=exam_id,
+                user=user,
+                added_by=added_by,
+                token=str(uuid.uuid4())
+            )
+            for user in users_to_add
+        ]
+
+        # Bulk create for efficiency
+        ExamInvitation.objects.bulk_create(invitations)
+
+        serializer = self.get_serializer(invitations, many=True)
+        return Response(serializer.data, status=201)
+
+    @action(detail=False, methods=["post"], url_path="delete-all-users")
+    def delete_all_users(self, request):
+        """
+        Delete all users from a given exam.
+        Request body:
+        {
+            "exam": 1
+        }
+        """
+        exam_id = request.data.get("exam")
+        if not exam_id:
+            return Response({"error": "exam is required"}, status=400)
+
+        deleted_count, _ = ExamInvitation.objects.filter(exam_id=exam_id).delete()
+        return Response({"deleted": deleted_count}, status=200)
+
 
 
 class ExamStartAPIView(APIView):

@@ -7,8 +7,12 @@ import { toLocalInputValue } from "@/utils/date";
 interface ExamFormProps {
   initialData?: Partial<Exam>;
   departments: Department[];
-  onSubmit: (payload: any) => Promise<void>;
+  onSubmit: (
+    payload: any,
+    options?: { addAllQuestions: boolean; addAllUsers: boolean }
+  ) => Promise<void>;
   onCancel: () => void;
+  isAdd?: boolean;
 }
 
 export default function ExamForm({
@@ -16,6 +20,7 @@ export default function ExamForm({
   departments,
   onSubmit,
   onCancel,
+  isAdd,
 }: ExamFormProps) {
   console.log(initialData);
   const [title, setTitle] = useState(initialData.title ?? "");
@@ -35,6 +40,9 @@ export default function ExamForm({
     initialData.passing_score ?? 60
   );
 
+  const [addAllQuestions, setAddAllQuestions] = useState(true);
+  const [addAllUsers, setAddAllUsers] = useState(true);
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const payload = {
@@ -42,12 +50,13 @@ export default function ExamForm({
       duration_minutes: duration,
       scheduled_start: start,
       scheduled_end: end,
-      department,
+      department: department,
       repeat_after_days: repeatAfterDays ? Number(repeatAfterDays) : null,
       instructions: instruction,
       passing_score: passingScore,
     };
-    await onSubmit(payload);
+
+    await onSubmit(payload, { addAllQuestions, addAllUsers });
   }
 
   return (
@@ -64,7 +73,6 @@ export default function ExamForm({
           className="mt-1 w-full border border-gray-300 rounded-lg p-2"
         />
       </div>
-
       {/* Department */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
@@ -87,7 +95,6 @@ export default function ExamForm({
           ))}
         </select>
       </div>
-
       {/* Duration */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
@@ -101,7 +108,6 @@ export default function ExamForm({
           className="mt-1 w-full border border-gray-300 rounded-lg p-2"
         />
       </div>
-
       {/* Start / End */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
@@ -114,7 +120,6 @@ export default function ExamForm({
           className="mt-1 w-full border border-gray-300 rounded-lg p-2"
         />
       </div>
-
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Scheduled End
@@ -140,7 +145,6 @@ export default function ExamForm({
           className="mt-1 w-full border border-gray-300 rounded-lg p-2"
         />
       </div>
-
       {/* Passing Score */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
@@ -155,7 +159,6 @@ export default function ExamForm({
           className="mt-1 w-full border border-gray-300 rounded-lg p-2"
         />
       </div>
-
       {/* Instructions */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
@@ -168,7 +171,40 @@ export default function ExamForm({
           className="mt-1 w-full border border-gray-300 rounded-lg p-2"
         />
       </div>
-
+      {isAdd && (
+        <>
+          {/* checkbox for add all questions */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="addAllQuestions"
+              checked={addAllQuestions}
+              onChange={(e) => setAddAllQuestions(e.target.checked)}
+              className="h-4 w-4"
+            />
+            <label htmlFor="addAllQuestions" className="text-sm text-gray-700">
+              Include all <span className="text-theme">Questions</span> from
+              this selected department to this{" "}
+              <span className="text-theme">Exam</span>.
+            </label>
+          </div>
+          {/* checkbox for add all users */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="addAllUsers"
+              checked={addAllUsers}
+              onChange={(e) => setAddAllUsers(e.target.checked)}
+              className="h-4 w-4"
+            />
+            <label htmlFor="addAllUsers" className="text-sm text-gray-700">
+              Include all <span className="text-theme">Users</span> from
+              selected department to this{" "}
+              <span className="text-theme">Exam</span>.
+            </label>
+          </div>
+        </>
+      )}
       <div className="flex gap-2">
         <button
           type="submit"

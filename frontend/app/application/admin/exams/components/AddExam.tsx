@@ -18,10 +18,37 @@ export default function AddExam({
   setExams,
   departments,
 }: Props) {
-  async function handleAdd(payload: any) {
+  async function handleAdd(
+    payload: any,
+    options?: { addAllQuestions: boolean; addAllUsers: boolean }
+  ) {
     const res = await apiClient.post("/api/v1/exams/exams/", payload);
-    setExams((prev) => [...prev, res.data]);
+    const exam: Exam = res.data;
+
+    // Update UI immediately
+    setExams((prev) => [...prev, exam]);
     setAddExamForm(false);
+
+    // Only do extra calls if checkboxes ticked
+    if (options) {
+      const { addAllQuestions, addAllUsers } = options;
+
+      if (addAllQuestions) {
+        const res = await apiClient.post(
+          "/api/v1/exams/examquestions/bulk_create/",
+          {
+            exam_id: exam.id,
+            department_id: payload.department,
+          }
+        );
+      }
+
+      // if (addAllUsers) {
+      //   await apiClient.post(`/api/v1/exams/${exam.id}/add-users/`, {
+      //     department: payload.department,
+      //   });
+      // }
+    }
   }
 
   return (
@@ -47,6 +74,7 @@ export default function AddExam({
             departments={departments}
             onSubmit={handleAdd}
             onCancel={() => setAddExamForm(false)}
+            isAdd={true}
           />
         </div>
       </div>
