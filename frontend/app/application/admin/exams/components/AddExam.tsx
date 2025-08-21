@@ -43,11 +43,15 @@ export default function AddExam({
         );
       }
 
-      // if (addAllUsers) {
-      //   await apiClient.post(`/api/v1/exams/${exam.id}/add-users/`, {
-      //     department: payload.department,
-      //   });
-      // }
+      if (addAllUsers) {
+        await apiClient.post(
+          `/api/v1/exams/examinvitations/add-department-users/`,
+          {
+            exam: exam.id,
+            department: payload.department,
+          }
+        );
+      }
     }
   }
 

@@ -40,7 +40,7 @@ export default function ExamForm({
     initialData.passing_score ?? 60
   );
 
-  const [addAllQuestions, setAddAllQuestions] = useState(true);
+  const [addAllQuestions, setAddAllQuestions] = useState(false);
   const [addAllUsers, setAddAllUsers] = useState(true);
 
   async function handleSubmit(e: FormEvent) {
@@ -189,7 +189,7 @@ export default function ExamForm({
             </label>
           </div>
           {/* checkbox for add all users */}
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <input
               type="checkbox"
               id="addAllUsers"
@@ -202,7 +202,7 @@ export default function ExamForm({
               selected department to this{" "}
               <span className="text-theme">Exam</span>.
             </label>
-          </div>
+          </div> */}
         </>
       )}
       <div className="flex gap-2">

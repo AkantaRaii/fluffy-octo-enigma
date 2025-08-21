@@ -1,4 +1,4 @@
-import { Exam } from "@/types/Exam";
+import { Exam, ExamInvitation } from "@/types/Exam";
 import apiServer from "@/utils/axiosServer";
 import Body from "./components/Body";
 import { ExamQuestion, Question } from "@/types/QuestionOption";
@@ -9,15 +9,15 @@ interface Props {
 }
 export default async function page({ params }: Props) {
   //exam id from parameter
-  const examId = params.examId;
+  const examId = await params.examId;
   const examRes = await apiServer.get(`/api/v1/exams/exams/${examId}/`);
   const exam: Exam = examRes.data;
 
   //inv users ko list
-  const userInvitationsRes = await apiServer.get(
+  const examInvitationsRes = await apiServer.get(
     `/api/v1/exams/examinvitations/?exam=${examId}`
   );
-  const userInvitations: any = userInvitationsRes.data;
+  const examInvitations: ExamInvitation[] = examInvitationsRes.data;
 
   //exam question ko list
   const examQuestionsRes = await apiServer.get(
@@ -72,6 +72,7 @@ export default async function page({ params }: Props) {
         examQuestions={examQuestions}
         exam={exam}
         departments={departments}
+        examInvitations={examInvitations}
       />
     </div>
   );

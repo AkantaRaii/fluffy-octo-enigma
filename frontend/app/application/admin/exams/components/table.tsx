@@ -83,6 +83,7 @@ export default function Table({
               <td className="py-3 px-4 text-gray-500 cursor-pointer">
                 <div className="flex flex-row gap-2">
                   <div
+                    title="Edit Exam"
                     className="hover:cursor-pointer text-gray-500 hover:bg-white hover:text-gray-600 text-center rounded-full p-2"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -93,6 +94,7 @@ export default function Table({
                     <FilePenLine width={18} height={18} />
                   </div>
                   <div
+                    title="Delete Exam"
                     className=" hover:cursor-pointer text-gray-500 hover:bg-white hover:text-gray-600 text-center rounded-full p-2"
                     onClick={(e) => {
                       e.stopPropagation();

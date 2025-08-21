@@ -81,14 +81,14 @@ class ExamQuestion(models.Model):
         ordering = ['order']    
 
 class ExamInvitation(models.Model):
-    """Tracks who gets which exam (for groups/individuals)."""
+    """Tracks who gets which exam."""
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="invitated_to")
     added_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="invitated_by")
     sent_at = models.DateTimeField(auto_now_add=True)
     token = models.CharField(max_length=100, unique=True)  # For secure exam links
     is_attempted = models.BooleanField(default=False)
-
+    
     class Meta:
         unique_together = ('exam', 'user')
 

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import *
-
+from users.serialzers import UserSerializer
 
 class DepartmentSerializers(serializers.ModelSerializer):
     class Meta:
@@ -100,7 +100,7 @@ from .models import ExamInvitation
 
 class ExamInvitationSerializer(serializers.ModelSerializer):
     exam_title = serializers.CharField(source="exam.title", read_only=True)
-    user_email = serializers.EmailField(source="user.email", read_only=True)
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = ExamInvitation
@@ -109,17 +109,12 @@ class ExamInvitationSerializer(serializers.ModelSerializer):
             "exam",
             "exam_title",
             "user",
-            "user_email",
             "sent_at",
             "added_by",
             "token",
             "is_attempted",
         ]
         read_only_fields = ["sent_at", "token","added_by"]
-
-        
-
-
 
 # yo chai exam ko bela correct options njaos vanera matra 
 class OptionSafeSerializer(serializers.ModelSerializer):

@@ -57,17 +57,19 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
             <div className="flex justify-end gap-3 mt-6">
               <button
+                title="cancel"
                 onClick={closeModal}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 hover:cursor-pointer"
               >
                 Cancel
               </button>
               <button
+                title="Delete Exam"
                 onClick={() => {
                   confirmAction();
                   closeModal();
                 }}
-                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 hover:cursor-pointer"
               >
                 {confirmLabel}
               </button>

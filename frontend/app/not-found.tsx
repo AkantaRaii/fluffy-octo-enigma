@@ -16,14 +16,14 @@ export default function NotFound() {
         <div className="flex items-center gap-3 p-6 border-b border-slate-200">
           <Image
             src="/gtnlogo.png"
-            width={36}
-            height={36}
+            width={60}
+            height={60}
             alt="Company Logo"
             className="rounded-md"
             priority
           />
           <span className="text-sm font-semibold tracking-wide text-slate-700">
-            Your Company
+            Green Tick Nepal
           </span>
         </div>
 

@@ -36,7 +36,7 @@ class OptionViewSet(viewsets.ModelViewSet):
 class ExamViewSet(viewsets.ModelViewSet):
     queryset=Exam.objects.all()
     serializer_class=ExamSerializers
-    filter_backends=[filters.SearchFilter,filters.OrderingFilter]
+    filter_backends=[filters.SearchFilter,filters.OrderingFilter,DjangoFilterBackend]
     search_fields=['title','instructions']
     ordering_fields=['scheduled_start','duration_minutes']
     def perform_create(self, serializer):
@@ -112,6 +112,22 @@ class ExamViewSet(viewsets.ModelViewSet):
             "skipped_existing": skipped,
             "include_existing": include_existing
         }, status=status.HTTP_200_OK)
+    @action(detail=False, methods=['get'], url_path='my-invitations')
+    def my_invitations(self, request):
+        """
+        List all exams the current user has been invited to.
+        Supports ordering.
+        """
+        user = request.user
+        exams = Exam.objects.filter(examinvitation__user=user).distinct()
+
+        # Apply ordering from query param ?ordering=scheduled_start
+        ordering = self.request.query_params.get('ordering')
+        if ordering in ['scheduled_start', '-scheduled_start', 'duration_minutes', '-duration_minutes']:
+            exams = exams.order_by(ordering)
+
+        serializer = self.get_serializer(exams, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 class ExamQuestionviewSet(viewsets.ModelViewSet):
     queryset=ExamQuestion.objects.all()
     serializer_class=ExamQuestionSerializer
@@ -162,7 +178,7 @@ class ExamInvitationViewSet(viewsets.ModelViewSet):
     queryset = ExamInvitation.objects.all()
     serializer_class = ExamInvitationSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['exam']
+    filterset_fields = ['exam','user']
 
     def perform_create(self, serializer):
         # Auto-generate token using UUID and set added_by
@@ -238,6 +254,9 @@ class ExamStartAPIView(APIView):
 
         #  Check if current time is within the exam window exam timeframe ma aauna paryo request
         now = timezone.now()
+        print(now)
+        print(exam.scheduled_start)
+        print(exam.scheduled_end)
         if not (exam.scheduled_start <= now <= exam.scheduled_end):
             return Response({'error': 'Exam is not available'}, status=403)
 

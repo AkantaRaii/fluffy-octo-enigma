@@ -3,14 +3,20 @@ import { useState } from "react";
 import ManageUserPage from "./ManageUserPage";
 import ManageQuestionPage from "./ManageQuestionPage";
 import { ExamQuestion } from "@/types/QuestionOption";
-import { Exam } from "@/types/Exam";
+import { Exam, ExamInvitation } from "@/types/Exam";
 import { Department } from "@/types/Depertment";
 interface Props {
   examQuestions: ExamQuestion[];
   exam: Exam;
   departments: Department[];
+  examInvitations: ExamInvitation[];
 }
-export default function Body({ examQuestions, exam, departments }: Props) {
+export default function Body({
+  examQuestions,
+  exam,
+  departments,
+  examInvitations,
+}: Props) {
   const [activeTab, setActiveTab] = useState<"users" | "questions">("users");
 
   return (
@@ -53,7 +59,7 @@ export default function Body({ examQuestions, exam, departments }: Props) {
             departments={departments}
           />
         )}
-        {activeTab === "users" && <ManageUserPage />}
+        {activeTab === "users" && <ManageUserPage examInvitations={examInvitations}/>}
       </div>
     </div>
   );
