@@ -69,8 +69,6 @@ class Exam(models.Model):
         if self.repeat_after_days:
             return self.scheduled_start + timedelta(days=self.repeat_after_days)
         return None
-
-
 class ExamQuestion(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name='exam_questions')
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -91,5 +89,3 @@ class ExamInvitation(models.Model):
     
     class Meta:
         unique_together = ('exam', 'user')
-
-

@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/auth/', include('users.urls')),
     path('api/v1/exams/', include('exams.urls')),
+    path('api/v1/examsession/', include('results_and_attempts.urls')),
     # path('api/notifications/', include('notifications.urls')),
 ]

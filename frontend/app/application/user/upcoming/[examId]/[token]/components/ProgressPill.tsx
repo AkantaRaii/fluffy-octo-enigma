@@ -7,8 +7,6 @@ export default function ProgressPill({
   current: number;
   total: number;
 }) {
-  current = 20;
-  total = 100;
   const pct = Math.round((current / Math.max(1, total)) * 100);
   return (
     <div className="flex items-center gap-2">

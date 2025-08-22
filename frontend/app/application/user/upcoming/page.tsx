@@ -1,6 +1,7 @@
 import { Exam } from "@/types/Exam";
 import ExamTable from "./UserExamTable";
 import apiServer from "@/utils/axiosServer";
+import Body from "./Body";
 
 async function getExams(): Promise<Exam[]> {
   try {
@@ -16,10 +17,5 @@ async function getExams(): Promise<Exam[]> {
 export default async function Page() {
   const exams = await getExams();
 
-  return (
-    <div className="p-6">
-      <h1 className="text-xl font-semibold mb-4">Available Exams</h1>
-      <ExamTable exams={exams} />
-    </div>
-  );
+  return <Body exams={exams} />;
 }

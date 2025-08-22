@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import StatusPill from "./StatusPill";
 import ProgressPill from "./ProgressPill";
 import QuestionCard from "./QuestionCard";
-
+import apiClient from "@/utils/axiosClient";
 type Option = { id: number; text: string };
 type QuestionType = "MCQ_SINGLE" | "MCQ_MULTI";
 export type Question = {
@@ -22,9 +22,24 @@ export type ExamData = {
 };
 
 export default function ExamDashboard({ exam }: { exam: ExamData }) {
+  const storageKey = `exam-answers-${exam.attempt_id}`;
   const [answers, setAnswers] = useState<Record<number, number | number[]>>({});
   const [submitting, setSubmitting] = useState(false);
+  useEffect(() => {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        setAnswers(JSON.parse(saved));
+      } catch {
+        console.warn("Invalid saved answers, ignoring.");
+      }
+    }
+  }, [storageKey]);
 
+  // ✅ Persist answers whenever they change
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(answers));
+  }, [answers, storageKey]);
   const totalMarks = useMemo(
     () => exam.questions.reduce((sum, q) => sum + (q.marks || 0), 0),
     [exam.questions]
@@ -69,9 +84,20 @@ export default function ExamDashboard({ exam }: { exam: ExamData }) {
           };
         }),
       };
+
       console.log("Submitting:", payload);
-      await new Promise((r) => setTimeout(r, 500));
+
+      // send with apiClient
+      const res = await apiClient.post(
+        "/api/v1/examsession/responses/bulk_save/",
+        payload
+      );
+
+      console.log("Saved responses:", res.data);
       alert("Submitted!");
+    } catch (err: any) {
+      console.error("Bulk save error:", err.response?.data || err.message);
+      alert("Failed to save responses: " + JSON.stringify(err.response?.data));
     } finally {
       setSubmitting(false);
     }
@@ -101,7 +127,7 @@ export default function ExamDashboard({ exam }: { exam: ExamData }) {
             <p className="text-xs text-neutral-600"></p>
           </div>
           <div className="hidden md:flex items-center gap-6">
-            <StatusPill started />
+            {/* <StatusPill started /> */}
             <ProgressPill
               current={answeredCount}
               total={exam.questions.length}
@@ -118,7 +144,7 @@ export default function ExamDashboard({ exam }: { exam: ExamData }) {
       </header>
 
       {/* Main */}
-      <main className="mx-auto max-w-6xl px-4 py-6 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+      <main className=" max-w-6xl py-6 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
         <section className="space-y-4">
           {exam.questions.map((q, idx) => (
             <QuestionCard
@@ -129,7 +155,6 @@ export default function ExamDashboard({ exam }: { exam: ExamData }) {
               updateSingle={updateSingle}
               updateMulti={updateMulti}
             />
-            // <h2>question</h2>
           ))}
         </section>
 

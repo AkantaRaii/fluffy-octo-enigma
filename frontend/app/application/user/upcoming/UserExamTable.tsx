@@ -5,10 +5,11 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 
 interface ExamTableProps {
+  activeTab: "activeExam" | "pastExam";
   exams: Exam[];
 }
 
-export default function ExamTable({ exams }: ExamTableProps) {
+export default function ExamTable({ activeTab, exams }: ExamTableProps) {
   const router = useRouter();
 
   return (
@@ -28,12 +29,19 @@ export default function ExamTable({ exams }: ExamTableProps) {
         <tbody className="text-sm">
           {exams.length > 0 ? (
             exams
-              .filter((exam) => exam.is_active)
+              .filter((exam) =>
+                activeTab === "activeExam" ? exam.is_active : !exam.is_active
+              )
               .map((exam) => (
                 <tr
                   key={exam.id}
                   onClick={() =>
-                    router.push(`/application/user/upcoming/${exam.id}`)
+                    activeTab === "activeExam"
+                      ? router.push(`/application/user/upcoming/${exam.id}`)
+                      : // : router.push(`/application/user/upcoming/result`)
+                        router.push(
+                          `/application/user/upcoming/result/${exam.id}`
+                        )
                   }
                   className="border-b border-gray-300 last:border-b-0 hover:bg-gray-100 hover:cursor-pointer transition"
                 >
