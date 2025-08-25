@@ -1,15 +1,15 @@
 // app/admin/layout.tsx
-"use client";
 
 import Layout from "@/components/Layout";
 import { ModalProvider } from "@/context/ModalContext";
 import { Home, Users, FileQuestion, ClipboardList, Send } from "lucide-react";
-
-export default function AdminLayout({
+import { getServerSession } from "next-auth";
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession();
   const menuItems = [
     {
       label: "Dashboard",
@@ -43,7 +43,8 @@ export default function AdminLayout({
       title="Admin Panel"
       sidebarTitle="Admin"
       menuItems={menuItems}
-      rightSlot={<div className="text-sm opacity-70"></div>}
+      session={session}
+      rightSlot={<div className="text-sm opacity-70">asdjasndfa</div>}
     >
       <ModalProvider>{children}</ModalProvider>
     </Layout>

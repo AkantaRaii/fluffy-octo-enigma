@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Sidebar, { MenuItem } from "@/components/Sidebar";
 import SessionWrapper from "./SessionWrapper";
-import { useSession } from "next-auth/react";
-
+import ProfileSection from "./ProfileSection";
+import { Session } from "next-auth";
 interface LayoutProps {
   children: React.ReactNode;
   title: string;
   menuItems: MenuItem[];
   sidebarTitle?: string;
+  session?: Session | null;
   rightSlot?: React.ReactNode; // optional content on navbar right
 }
 
@@ -19,10 +20,9 @@ export default function Layout({
   title,
   menuItems,
   sidebarTitle = title,
+  session,
   rightSlot,
 }: LayoutProps) {
-  const { data: session } = useSession();
-
   const [isLg, setIsLg] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -53,7 +53,7 @@ export default function Layout({
           <Navbar
             title={title}
             onMenuClick={() => setOpen(true)}
-            rightSlot={session?.email}
+            rightSlot={<ProfileSection session={session || null} />}
           />
           <main className="p-4 ">{children}</main>
         </div>

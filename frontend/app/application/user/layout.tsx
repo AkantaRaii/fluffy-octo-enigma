@@ -1,15 +1,14 @@
 // app/user/layout.tsx
-"use client";
-
 import Layout from "@/components/Layout";
 import { ModalProvider } from "@/context/ModalContext";
 import { Home, Clock, History, User as UserIcon } from "lucide-react";
-
-export default function UserLayout({
+import { getServerSession } from "next-auth";
+export default async function UserLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession();
   const menuItems = [
     { label: "Dashboard", href: "/application/user", icon: <Home size={18} /> },
     {
@@ -33,6 +32,7 @@ export default function UserLayout({
       title="Exam Portal"
       sidebarTitle="My Exams"
       menuItems={menuItems}
+      session={session}
       rightSlot={<div className="text-sm opacity-70">student@you</div>}
     >
       <ModalProvider>{children}</ModalProvider>

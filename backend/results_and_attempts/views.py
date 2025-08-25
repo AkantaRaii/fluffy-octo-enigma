@@ -60,4 +60,3 @@ class ExamResultViewSet(viewsets.ReadOnlyModelViewSet):
         return UserExamAttempt.objects.filter(user=self.request.user)
     # def get_queryset(self):
     #     return UserExamAttempt.objects.filter)
-
