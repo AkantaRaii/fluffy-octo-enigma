@@ -13,18 +13,30 @@ export default function InputField() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-      callbackUrl: "/",
-    });
-    if (response?.ok) {
-      router.push("/");
-    } else {
+    setLoading(true);
+    try {
+      const response = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+        callbackUrl: "/",
+      });
+
+      if (response?.ok) {
+        toast.success("Logged in successfully!");
+        router.push("/");
+      } else {
+        toast.error(response?.error || "Invalid credentials");
+      }
+    } catch (error) {
+      toast.error("Login failed. Please try again.");
+    } finally {
+      toast.error("Login failed. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -89,10 +101,10 @@ export default function InputField() {
           </div>
           <button
             type="submit"
-            className="rounded-md hover:cursor-pointer bg-primaryAction text-white w-full h-10 my-3 py-2"
+            disabled={loading}
+            className="rounded-md hover:cursor-pointer bg-primaryAction text-white w-full h-10 my-3 py-2 disabled:opacity-50"
           >
-            {" "}
-            Sign In
+            {loading ? "Signing In..." : "Sign In"}
           </button>
           <div className=" w-full flex flex-row gap-4 items-center text-sm text-gray-500 py-2">
             <hr className="flex-1 border-t border-gray-300" />

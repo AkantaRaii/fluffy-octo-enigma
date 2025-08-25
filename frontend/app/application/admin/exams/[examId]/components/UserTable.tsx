@@ -1,11 +1,9 @@
 import React from "react";
 import { ExamInvitation } from "@/types/Exam";
 import { format } from "date-fns";
-import { useModal } from "@/context/ModalContext";
 import apiClient from "@/utils/axiosClient";
-import { Trash } from "lucide-react";
-import { div } from "motion/react-client";
-
+import toast from "react-hot-toast";
+import { redirect } from "next/navigation";
 interface InvitationTableProps {
   examInvitations: ExamInvitation[];
   setInvitations: React.Dispatch<React.SetStateAction<ExamInvitation[]>>;
@@ -15,17 +13,6 @@ export default function UserInvitationTable({
   examInvitations,
   setInvitations,
 }: InvitationTableProps) {
-  const { showModal } = useModal();
-
-  const handleDelete = async (row: ExamInvitation) => {
-    try {
-      await apiClient.delete(`/api/v1/exams/invitations/${row.id}/`);
-      setInvitations((prev) => prev.filter((inv) => inv.id !== row.id));
-    } catch (err) {
-      console.error("Delete failed", err);
-    }
-  };
-
   if (examInvitations.length == 0) {
     return (
       <p className="text-center pt-5 text-sm italic text-gray-400">
@@ -48,8 +35,12 @@ export default function UserInvitationTable({
         <tbody className="text-sm">
           {examInvitations.map((row) => (
             <tr
+              onClick={(e) => {
+                e.stopPropagation();
+                redirect(`/application/admin/exams/${row.exam}/${row.user.id}`);
+              }}
               key={row.id}
-              className="border-b border-gray-300 last:border-b-0 hover:bg-gray-200 transition"
+              className="border-b border-gray-300 last:border-b-0 hover:bg-gray-200 transition hover:cursor-pointer"
             >
               <td className="py-3 px-4">{row.user.email}</td>
               <td className="py-3 px-4">{row.user.role}</td>

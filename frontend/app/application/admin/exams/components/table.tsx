@@ -53,8 +53,14 @@ export default function Table({
             >
               <td className="py-3 px-4">{row.title}</td>
               <td className="py-3 px-4">{row.department_name}</td>
-              <td className="py-3 px-4">
-                {format(new Date(row.scheduled_start), "yyyy-MM-dd HH:mm")}
+              <td className="py-3 px-4 text-sm text-gray-700 whitespace-nowrap">
+                <span className="font-medium text-gray-900">
+                  {format(new Date(row.scheduled_start), "MMM dd, yyyy")}
+                </span>
+                <br />
+                <span className="text-xs text-gray-500">
+                  {format(new Date(row.scheduled_start), "hh:mm a")}
+                </span>
               </td>
               <td className="py-3 px-4">
                 {row.repeat_after_days != null ? (
@@ -84,7 +90,7 @@ export default function Table({
                 <div className="flex flex-row gap-2">
                   <div
                     title="Edit Exam"
-                    className="hover:cursor-pointer text-gray-500 hover:bg-white hover:text-gray-600 text-center rounded-full p-2"
+                    className="hover:cursor-pointer text-theme hover:bg-white hover:text-midTheme text-center rounded-full p-2"
                     onClick={(e) => {
                       e.stopPropagation();
                       setEditExamForm(true);
@@ -95,7 +101,7 @@ export default function Table({
                   </div>
                   <div
                     title="Delete Exam"
-                    className=" hover:cursor-pointer text-gray-500 hover:bg-white hover:text-gray-600 text-center rounded-full p-2"
+                    className=" hover:cursor-pointer text-red-500 hover:bg-white hover:text-red-600 text-center rounded-full p-2"
                     onClick={(e) => {
                       e.stopPropagation();
                       showModal(() => handleDelete(row), {

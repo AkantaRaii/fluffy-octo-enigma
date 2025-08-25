@@ -17,11 +17,11 @@ export default function UserLayout({
       href: "/application/user/upcoming",
       icon: <Clock size={18} />,
     },
-    {
-      label: "Past Exams",
-      href: "/application/user/past",
-      icon: <History size={18} />,
-    },
+    // {
+    //   label: "Past Exams",
+    //   href: "/application/user/past",
+    //   icon: <History size={18} />,
+    // },
     {
       label: "Profile",
       href: "/application/user/profile",

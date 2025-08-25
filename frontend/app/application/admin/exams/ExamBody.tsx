@@ -21,14 +21,20 @@ export default function ExamBody({ examList, departments }: Props) {
       <div className="mb-2 px-1 flex flex-row justify-between">
         <h1 className="text-xl font-semibold ">Exams</h1>
         <div
+        title="add exam"
           onClick={() => setAddExamForm((prev) => !prev)}
-          className="border border-gray-300 px-4 rounded-md shadow-gray-300 shadow hover:bg-gray-100 flex flex-row items-center justify-around cursor-pointer "
+          className="border text-white border-gray-300 px-4 rounded-sm shadow-gray-300 shadow py-2 bg-midTheme hover:bg-hardTheme flex flex-row items-center justify-around cursor-pointer "
         >
           <Plus width={16} height={16} />
           <p>Add Exam</p>
         </div>
       </div>
-      <Table data={exams} setEditExamForm={setEditExamForm} setCurrentExam={setCurrentExam} setExams={setExams}/>
+      <Table
+        data={exams}
+        setEditExamForm={setEditExamForm}
+        setCurrentExam={setCurrentExam}
+        setExams={setExams}
+      />
       {addExamForm && (
         <AddExam
           setAddExamForm={setAddExamForm}

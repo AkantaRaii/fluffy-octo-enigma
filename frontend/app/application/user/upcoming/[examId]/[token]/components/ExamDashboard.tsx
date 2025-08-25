@@ -1,10 +1,11 @@
 "use client";
-
 import { useState, useEffect, useMemo } from "react";
-import StatusPill from "./StatusPill";
 import ProgressPill from "./ProgressPill";
 import QuestionCard from "./QuestionCard";
 import apiClient from "@/utils/axiosClient";
+import { useRouter } from "next/navigation";
+import { a } from "motion/react-client";
+import toast from "react-hot-toast";
 type Option = { id: number; text: string };
 type QuestionType = "MCQ_SINGLE" | "MCQ_MULTI";
 export type Question = {
@@ -20,8 +21,14 @@ export type ExamData = {
   attempt_id: number;
   questions: Question[];
 };
-
-export default function ExamDashboard({ exam }: { exam: ExamData }) {
+export default function ExamDashboard({
+  exam,
+  examId,
+}: {
+  exam: ExamData;
+  examId: string;
+}) {
+  const router = useRouter();
   const storageKey = `exam-answers-${exam.attempt_id}`;
   const [answers, setAnswers] = useState<Record<number, number | number[]>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -35,8 +42,6 @@ export default function ExamDashboard({ exam }: { exam: ExamData }) {
       }
     }
   }, [storageKey]);
-
-  // ✅ Persist answers whenever they change
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(answers));
   }, [answers, storageKey]);
@@ -69,42 +74,51 @@ export default function ExamDashboard({ exam }: { exam: ExamData }) {
 
   async function handleSubmit() {
     setSubmitting(true);
-    try {
-      const payload = {
-        attempt_id: exam.attempt_id,
-        responses: exam.questions.map((q) => {
-          const value = answers[q.id];
-          return {
-            question_id: q.id,
-            selected_option_ids: Array.isArray(value)
-              ? value
-              : value
-              ? [value]
-              : [],
-          };
-        }),
-      };
+    if (exam.questions.length === answeredCount) {
+      try {
+        const payload = {
+          attempt_id: exam.attempt_id,
+          responses: exam.questions.map((q) => {
+            const value = answers[q.id];
+            return {
+              question_id: q.id,
+              selected_option_ids: Array.isArray(value)
+                ? value
+                : value
+                ? [value]
+                : [],
+            };
+          }),
+        };
+        console.log("Submitting:", payload);
+        // send with apiClient
+        const res = await apiClient.post(
+          "/api/v1/examsession/responses/bulk_save/",
+          payload
+        );
+        console.log(exam);
+        const examRes = await apiClient.patch(
+          `/api/v1/exams/exams/${examId}/`,
+          {
+            is_active: false,
+          }
+        );
 
-      console.log("Submitting:", payload);
-
-      // send with apiClient
-      const res = await apiClient.post(
-        "/api/v1/examsession/responses/bulk_save/",
-        payload
-      );
-
-      console.log("Saved responses:", res.data);
-      alert("Submitted!");
-    } catch (err: any) {
-      console.error("Bulk save error:", err.response?.data || err.message);
-      alert("Failed to save responses: " + JSON.stringify(err.response?.data));
-    } finally {
+        console.log("Saved responses:", res.data);
+        router.push(`/application/user/upcoming/result/${examId}`);
+      } catch (err: any) {
+        console.error("Bulk save error:", err.response?.data || err.message);
+      } finally {
+        setSubmitting(false);
+      }
+    } else {
+      toast.error("Please answer all questions before submitting.");
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900">
+    <div className="min-h-screen  text-neutral-900">
       <style jsx global>{`
         :root {
           --color-theme: #91a92a;
@@ -144,8 +158,8 @@ export default function ExamDashboard({ exam }: { exam: ExamData }) {
       </header>
 
       {/* Main */}
-      <main className=" max-w-6xl py-6 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
-        <section className="space-y-4">
+      <main className="w-full py-6 grid grid-cols-1 gap-4 lg:grid-cols-6">
+        <section className="space-y-4 lg:col-span-4">
           {exam.questions.map((q, idx) => (
             <QuestionCard
               key={q.id}
@@ -158,16 +172,27 @@ export default function ExamDashboard({ exam }: { exam: ExamData }) {
           ))}
         </section>
 
-        <aside className="lg:sticky lg:top-[72px] h-max space-y-4">
-          <div className="rounded-2xl border bg-white shadow-sm p-4">
+        <aside className="lg:col-span-2 lg:sticky lg:top-[72px] h-max space-y-4 w-full">
+          <div className="rounded-2xl border border-gray-300 bg-white shadow-sm p-4">
             <h3 className="text-sm font-semibold mb-2">Overview</h3>
-            <p className="text-sm">Questions: {exam.questions.length}</p>
-            <p className="text-sm">Answered: {answeredCount}</p>
-            <p className="text-sm">Marks: {totalMarks}</p>
+            <div className="flex justify-center gap-15 items-center">
+              <div className="text-sm col flex flex-col items-center">
+                <h1 className="text-3xl">{exam.questions.length}</h1>
+                <h1 className="text-sm text-gray-400">Questions</h1>
+              </div>
+              <div className="text-sm col flex flex-col items-center">
+                <h1 className="text-3xl">{answeredCount}</h1>
+                <h1 className="text-sm text-gray-400">Answered</h1>
+              </div>
+              <div className="text-sm col flex flex-col items-center">
+                <h1 className="text-3xl">{totalMarks}</h1>
+                <h1 className="text-sm text-gray-400">Total Marks</h1>
+              </div>
+            </div>
             {/* <StatusPill started block /> */}
             <button
               onClick={handleSubmit}
-              disabled={submitting}
+              disabled={submitting && exam.questions.length !== answeredCount}
               className="mt-4 w-full rounded-xl px-4 py-2 text-sm font-medium text-white bg-accent hover:opacity-90 disabled:opacity-50"
             >
               {submitting ? "Submitting..." : "Submit Exam"}

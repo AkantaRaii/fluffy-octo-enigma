@@ -71,9 +71,9 @@ export default function StartExamLanding({ exam, examInvitation }: Props) {
           <p className="mb-6 text-neutral-700 select-none">
             You may now start your exam.
           </p>
-          <button 
+          <button
             onClick={handleStart}
-            className="px-6 py-3 bg-accent  rounded-xl bg-red-300"
+            className="px-6 py-3 bg-accent  rounded-sm bg-theme text-white hover:scale-105 transition duration-200 hover:cursor-pointer"
           >
             Start Exam
           </button>

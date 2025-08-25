@@ -10,6 +10,7 @@ interface Question {
   correct_options: string[];
   is_correct: boolean;
 }
+
 // "id": 3,
 //         "exam": 22,
 //         "user": 1,
@@ -20,7 +21,6 @@ interface Question {
 //         "correct_answers": 2,
 //         "obtained_marks": 3.0,
 //         "total_marks": 10.0,
-
 interface Attempt {
   total_questions: number;
   correct_answers: number;
@@ -35,7 +35,7 @@ export default function ExamResult({ attempt }: { attempt?: Attempt }) {
   if (!attempt) {
     return (
       <div className="max-w-3xl mx-auto p-6 text-center text-gray-500">
-        Loading result...
+        This user havent sumbitted the exam yet.
       </div>
     );
   }
@@ -43,34 +43,28 @@ export default function ExamResult({ attempt }: { attempt?: Attempt }) {
   return (
     <div className="max-w-3xl mx-auto p-6">
       {/* Summary */}
-      <div className="mb-6 border border-gray-300 rounded-xl p-6 shadow-sm bg-white">
+      <div className="mb-6 border rounded-xl p-6 shadow-sm bg-white">
         <h2 className="text-xl font-semibold mb-4">Exam Result</h2>
         <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex flex-col gap justify-center items-center">
-            <span className="font-semibold text-3xl">
-              {attempt.total_questions}
-            </span>
-            <p className="text-gray-400">Total Questions</p>
-          </div>
-          <div className="flex flex-col gap justify-center items-center">
-            <span className="font-semibold text-theme text-3xl">
+          <p>
+            Total Questions:{" "}
+            <span className="font-medium">{attempt.total_questions}</span>
+          </p>
+          <p>
+            Correct Answers:{" "}
+            <span className="font-medium text-green-600">
               {attempt.correct_answers}
             </span>
-            <p className="text-gray-400">Correct Answers</p>
-          </div>
-          <div className="flex flex-col gap justify-center items-center">
-            <span className="font-semibold text-3xl">
-              {attempt.total_marks}
-            </span>
-            <p className="text-gray-400">Total Marks</p>
-          </div>
-          <div className="flex flex-col gap justify-center items-center">
-            <span className="font-semibold text-3xl">
-              {attempt.obtained_marks}
-            </span>
-            <p className="text-gray-400">Marks Obtained</p>
-          </div>
-          {/* <p>
+          </p>
+          <p>
+            Total Marks:{" "}
+            <span className="font-medium">{attempt.total_marks}</span>
+          </p>
+          <p>
+            Marks Obtained:{" "}
+            <span className="font-medium">{attempt.obtained_marks}</span>
+          </p>
+          <p>
             Status:
             <span
               className={`font-medium ml-1 ${
@@ -79,12 +73,12 @@ export default function ExamResult({ attempt }: { attempt?: Attempt }) {
             >
               {attempt.is_submitted ? "Submitted" : "In Progress"}
             </span>
-          </p> */}
+          </p>
         </div>
       </div>
 
       {/* Questions */}
-      {/* <div className="space-y-3">
+      <div className="space-y-3">
         {attempt.questions?.length ? (
           attempt.questions.map((q, index) => (
             <ExpandableQuestionCard
@@ -96,7 +90,7 @@ export default function ExamResult({ attempt }: { attempt?: Attempt }) {
         ) : (
           <p className="text-sm text-gray-500">No questions available</p>
         )}
-      </div> */}
+      </div>
     </div>
   );
 }
@@ -133,7 +127,7 @@ function ExpandableQuestionCard({
       </div>
 
       {/* Expanded View */}
-      {/* <AnimatePresence>
+      <AnimatePresence>
         {expanded && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
@@ -159,7 +153,7 @@ function ExpandableQuestionCard({
             </div>
           </motion.div>
         )}
-      </AnimatePresence> */}
+      </AnimatePresence>
     </motion.div>
   );
 }

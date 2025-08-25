@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
 import apiClient from "@/utils/axiosClient";
 import ExamForm from "./ExamForm";
+import toast from "react-hot-toast";
 
 interface Props {
   setAddExamForm: (value: boolean) => void;
@@ -22,36 +23,41 @@ export default function AddExam({
     payload: any,
     options?: { addAllQuestions: boolean; addAllUsers: boolean }
   ) {
-    const res = await apiClient.post("/api/v1/exams/exams/", payload);
-    const exam: Exam = res.data;
+    try {
+      const res = await apiClient.post("/api/v1/exams/exams/", payload);
+      const exam: Exam = res.data;
+      // Update UI immediately
+      setExams((prev) => [...prev, exam]);
+      setAddExamForm(false);
 
-    // Update UI immediately
-    setExams((prev) => [...prev, exam]);
-    setAddExamForm(false);
+      // Only do extra calls if checkboxes ticked
+      if (options) {
+        const { addAllQuestions, addAllUsers } = options;
 
-    // Only do extra calls if checkboxes ticked
-    if (options) {
-      const { addAllQuestions, addAllUsers } = options;
+        if (addAllQuestions) {
+          const res = await apiClient.post(
+            "/api/v1/exams/examquestions/bulk_create/",
+            {
+              exam_id: exam.id,
+              department_id: payload.department,
+            }
+          );
+        }
 
-      if (addAllQuestions) {
-        const res = await apiClient.post(
-          "/api/v1/exams/examquestions/bulk_create/",
-          {
-            exam_id: exam.id,
-            department_id: payload.department,
-          }
-        );
+        if (addAllUsers) {
+          await apiClient.post(
+            `/api/v1/exams/examinvitations/add-department-users/`,
+            {
+              exam: exam.id,
+              department: payload.department,
+            }
+          );
+        }
       }
-
-      if (addAllUsers) {
-        await apiClient.post(
-          `/api/v1/exams/examinvitations/add-department-users/`,
-          {
-            exam: exam.id,
-            department: payload.department,
-          }
-        );
-      }
+      toast.success("Exam created successfully!");
+    } catch (error) {
+      toast.error("Failed to create exam. Please try again.");
+      console.error("Create exam error:", error);
     }
   }
 

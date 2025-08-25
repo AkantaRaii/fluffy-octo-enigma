@@ -1,59 +1,77 @@
+"use client";
 import React from "react";
-
-interface RowData {
+import { Users, FileText } from "lucide-react";
+import { useRouter } from "next/navigation";
+export interface Department {
   id: number;
-  header: string;
-  sectionType: string;
-  status: "Done" | "In Process";
-  target: number;
-  limit: number;
-  reviewer: string;
+  name: string;
+  description: string;
 }
 
 interface TableProps {
-  data: RowData[];
+  data: Department[];
+  // onUsersClick?: (departmentId: number) => void;
+  // onExamsClick?: (departmentId: number) => void;
 }
 
-export default function Table({ data }: TableProps) {
+export default function DepartmentTable({
+  data,
+}: // onUsersClick,
+// onExamsClick,
+TableProps) {
+  const router = useRouter();
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
       <table className="min-w-full border-collapse">
         <thead>
-          <tr className="bg-gray-100 text-left text-sm font-medium text-gray-700">
-            <th className="w-6"></th> {/* drag handle */}
-            <th className="py-3 px-4">Header</th>
-            <th className="py-3 px-4">Section Type</th>
-            <th className="py-3 px-4">Status</th>
-            <th className="py-3 px-4">Target</th>
-            <th className="py-3 px-4">Limit</th>
-            <th className="py-3 px-4">Reviewer</th>
+          <tr className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+            <th className="py-3 px-4">ID</th>
+            <th className="py-3 px-4">Name</th>
+            <th className="py-3 px-4">Description</th>
             <th className="py-3 px-4">Actions</th>
           </tr>
         </thead>
-        <tbody className="text-sm">
-          {data.map((row) => (
+
+        <tbody className="text-sm text-gray-700">
+          {data.map((dept) => (
             <tr
-              key={row.id}
-              className="border-b last:border-b-0 hover:bg-gray-50 transition"
+              key={dept.id}
+              className="border-b border-gray-200 last:border-b-0 hover:bg-gray-200 transition hover:cursor-pointer"
+              onClick={() =>
+                router.push(`/application/admin/departments/users/${dept.id}`)
+              }
             >
-              <td className="py-3 px-4 cursor-grab text-gray-400">⠿</td>
-              <td className="py-3 px-4">{row.header}</td>
-              <td className="py-3 px-4">{row.sectionType}</td>
+              {/* ID */}
+              <td className="py-3 px-4 font-medium">{dept.id}</td>
+
+              {/* Name */}
+              <td className="py-3 px-4">{dept.name}</td>
+
+              {/* Description */}
+              <td className="py-3 px-4">{dept.description}</td>
+
+              {/* Actions */}
               <td className="py-3 px-4">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    row.status === "Done"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-                  {row.status}
-                </span>
+                <div className="flex items-center gap-2">
+                  {/* Users */}
+                  <button
+                    title="View Users"
+                    className="p-2 rounded-full hover:bg-white transition hover:scale-110 hover:cursor-pointer "
+                    // onClick={() => onUsersClick?.(dept.id)}
+                  >
+                    <Users className="w-4 h-4 text-blue-600" />
+                  </button>
+
+                  {/* Exams */}
+                  <button
+                    title="View Exams"
+                    className="p-2 rounded-full hover:bg-white transition hover:scale-105 hover:cursor-pointer"
+                    // onClick={() => onExamsClick?.(dept.id)}
+                  >
+                    <FileText className="w-4 h-4 text-green-600" />
+                  </button>
+                </div>
               </td>
-              <td className="py-3 px-4">{row.target}</td>
-              <td className="py-3 px-4">{row.limit}</td>
-              <td className="py-3 px-4">{row.reviewer}</td>
-              <td className="py-3 px-4 text-gray-500 cursor-pointer">⋮</td>
             </tr>
           ))}
         </tbody>

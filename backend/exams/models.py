@@ -55,7 +55,7 @@ class Exam(models.Model):
     passing_score = models.PositiveIntegerField(default=60)
     def clean(self):
         now = timezone.now()
-        if self.scheduled_start < now:
+        if self.scheduled_end < now:
             self.is_active = False  # auto-deactivate past exams
         if self.scheduled_end <= self.scheduled_start:
             raise ValidationError("Scheduled end must be after scheduled start")
@@ -86,6 +86,5 @@ class ExamInvitation(models.Model):
     sent_at = models.DateTimeField(auto_now_add=True)
     token = models.CharField(max_length=100, unique=True)  # For secure exam links
     is_attempted = models.BooleanField(default=False)
-    
     class Meta:
         unique_together = ('exam', 'user')

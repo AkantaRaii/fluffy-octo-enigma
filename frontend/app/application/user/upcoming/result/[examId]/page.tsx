@@ -18,4 +18,4 @@ export default async function page({ params }: Props) {
       <Body attempt={attempResult[0]} />
     </div>
   );
-}
+} 

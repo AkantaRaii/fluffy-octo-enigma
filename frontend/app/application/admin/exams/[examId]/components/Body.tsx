@@ -27,7 +27,7 @@ export default function Body({
         <div className="flex mb-2 rounded-lg border border-gray-200 bg-gray-300 p-1 ">
           <button
             onClick={() => setActiveTab("users")}
-            className={`flex-1 px-4  rounded-md text-sm font-medium transition hover:cursor-pointer
+            className={`flex-1 px-4 py-2 w-[200px] rounded-md text-sm font-medium transition hover:cursor-pointer
               ${
                 activeTab === "users"
                   ? "bg-white text-gray-800 shadow"
@@ -37,8 +37,8 @@ export default function Body({
             Manage Users
           </button>
           <button
-            onClick={() => setActiveTab("questions")}
-            className={`flex-1 px-4 rounded-md text-sm font-medium transition hover:cursor-pointer
+            onClick={() => setActiveTab("questions")} 
+            className={`flex-1 px-4 py-2 w-[200px] rounded-md text-sm font-medium transition hover:cursor-pointer
               ${
                 activeTab === "questions"
                   ? "bg-white text-gray-800 shadow"
@@ -59,7 +59,9 @@ export default function Body({
             departments={departments}
           />
         )}
-        {activeTab === "users" && <ManageUserPage examInvitations={examInvitations}/>}
+        {activeTab === "users" && (
+          <ManageUserPage examInvitations={examInvitations} />
+        )}
       </div>
     </div>
   );

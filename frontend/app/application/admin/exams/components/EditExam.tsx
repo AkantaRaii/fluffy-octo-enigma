@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
 import apiClient from "@/utils/axiosClient";
 import ExamForm from "./ExamForm";
+import toast from "react-hot-toast";
 
 interface Props {
   exam: Exam;
@@ -21,9 +22,18 @@ export default function EditExam({
   departments,
 }: Props) {
   async function handleEdit(payload: any) {
-    const res = await apiClient.put(`/api/v1/exams/exams/${exam.id}/`, payload);
-    setExams((prev) => prev.map((e) => (e.id === exam.id ? res.data : e)));
-    setEditExamForm(false);
+    try {
+      const res = await apiClient.put(
+        `/api/v1/exams/exams/${exam.id}/`,
+        payload
+      );
+      setExams((prev) => prev.map((e) => (e.id === exam.id ? res.data : e)));
+      setEditExamForm(false);
+      toast.success("Exam updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update exam. Please try again.");
+      console.error("Update exam error:", error);
+    }
   }
 
   return (

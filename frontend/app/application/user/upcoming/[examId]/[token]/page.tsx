@@ -8,7 +8,7 @@ export default async function TokenPage({
   params: { examId: string; token: string };
 }) {
   const { examId, token } = await params;
-  console.log(examId, token);
+
   // In a real app you’ll fetch exam data using params.token
   const examSessionRes = await apiServer(`api/v1/exams/start/${token}/`);
   const ExamSessionData: ExamSession = examSessionRes.data;
@@ -18,5 +18,5 @@ export default async function TokenPage({
     { exam_id: examId }
   );
   console.log(userAttemptResponse.data);
-  return <ExamDashboard exam={ExamSessionData} />;
+  return <ExamDashboard exam={ExamSessionData} examId={examId} />;
 }
