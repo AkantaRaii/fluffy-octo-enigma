@@ -28,7 +28,6 @@ class UserExamAttemptViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Already submitted"}, status=400)
 
         attempt.is_submitted = True
-        attempt.end_time = now()
         attempt.save()
         return Response({"detail": "Exam submitted successfully"})
 

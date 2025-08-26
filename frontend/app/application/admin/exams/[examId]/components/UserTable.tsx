@@ -1,9 +1,8 @@
 import React from "react";
 import { ExamInvitation } from "@/types/Exam";
 import { format } from "date-fns";
-import apiClient from "@/utils/axiosClient";
-import toast from "react-hot-toast";
 import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 interface InvitationTableProps {
   examInvitations: ExamInvitation[];
   setInvitations: React.Dispatch<React.SetStateAction<ExamInvitation[]>>;
@@ -13,6 +12,7 @@ export default function UserInvitationTable({
   examInvitations,
   setInvitations,
 }: InvitationTableProps) {
+  const router = useRouter();
   if (examInvitations.length == 0) {
     return (
       <p className="text-center pt-5 text-sm italic text-gray-400">
@@ -37,7 +37,9 @@ export default function UserInvitationTable({
             <tr
               onClick={(e) => {
                 e.stopPropagation();
-                redirect(`/application/admin/exams/${row.exam}/${row.user.id}`);
+                router.push(
+                  `/application/admin/exams/${row.exam}/${row.user.id}`
+                );
               }}
               key={row.id}
               className="border-b border-gray-300 last:border-b-0 hover:bg-gray-200 transition hover:cursor-pointer"

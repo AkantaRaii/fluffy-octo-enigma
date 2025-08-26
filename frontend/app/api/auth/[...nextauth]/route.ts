@@ -68,52 +68,63 @@ export const authOptions = {
   session: {
     strategy: "jwt" as const, // ✅ now TS recognizes this is a valid literal
   },
-    callbacks: {
-      async jwt({
-        token,
-        account,
-        user,
-      }: {
-        token: any;
-        account: any;
-        user?: any;
-      }) {
-        if (token.accessToken) {
-          const decodedToken = jwtDecode(token.accessToken);
-          if (decodedToken?.exp !== undefined) {
-            token.accessTokenExpires = decodedToken.exp * 1000;
-          }
+  callbacks: {
+    async jwt({
+      token,
+      account,
+      user,
+    }: {
+      token: any;
+      account: any;
+      user?: any;
+    }) {
+      if (token.accessToken) {
+        const decodedToken = jwtDecode(token.accessToken);
+        if (decodedToken?.exp !== undefined) {
+          token.accessTokenExpires = decodedToken.exp * 1000;
         }
-        if (user && account) {
-          return {
-            ...token,
-            accessToken: user.accessToken,
-            refreshToken: user.refreshToken,
-            id: user.id,
-            email: user.email,
-            role: user.role,
-          };
-        }
-        if (Date.now() < token.accessTokenExpires) {
-          return token;
-        }
-        return refreshToken(token);
-      },
-      async session({ session, token }: { session: any; token: any }) {
-        if (token) {
-          session.accessToken = token.accessToken || "";
-          session.refreshToken = token.refreshToken || "";
-          session.id = token.id;
-          session.email = token.email;
-          session.role = token.role;
-          session.accessTokenExpires = token.accessTokenExpires; 
-        }
-        return session;
-      },
+      }
+      if (user && account) {
+        return {
+          ...token,
+          accessToken: user.accessToken,
+          refreshToken: user.refreshToken,
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        };
+      }
+      if (Date.now() < token.accessTokenExpires) {
+        return token;
+      }
+      return refreshToken(token);
     },
-  };
+    async session({ session, token }: { session: any; token: any }) {
+      if (token) {
+        session.accessToken = token.accessToken || "";
+        session.refreshToken = token.refreshToken || "";
+        session.id = token.id;
+        session.email = token.email;
+        session.role = token.role;
+        session.accessTokenExpires = token.accessTokenExpires;
+      }
+      return session;
+    },
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
+      try {
+        const next = new URL(url, baseUrl).searchParams.get("next");
+        if (next) {
+          return `${baseUrl}${next}`;
+        }
+      } catch {
+        // ignore parsing errors
+      }
+      return baseUrl; // fallback (usually dashboard/home)
+    },
+  },
+};
 
-  const handler = NextAuth(authOptions);
-  export { handler as GET, handler as POST };
-  const auth = () => getServerSession(authOptions);
-  export { auth };
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };
+const auth = () => getServerSession(authOptions);
+export { auth };

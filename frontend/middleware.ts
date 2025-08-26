@@ -4,29 +4,27 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req });
-  const pathname = req.nextUrl.pathname;
+  const url = req.nextUrl;
 
-  if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
+  const redirectToLogin = () => {
+    const loginUrl = new URL("/login", req.url);
+    // Use absolute URL for callbackUrl (NextAuth-friendly)
+    loginUrl.searchParams.set("callbackUrl", url.toString());
+    return NextResponse.redirect(loginUrl);
+  };
 
-  if (Date.now() > token.accessTokenExpires!) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
+  if (!token) return redirectToLogin();
 
-  const role = token.role;
+  if (Date.now() > (token as any).accessTokenExpires!) return redirectToLogin();
 
-  if (
-    pathname.startsWith("/application/admin") &&
-    !(role === "ADMIN" || role === "ANALYZER")
-  ) {
+  const role = (token as any).role;
+  const pathname = url.pathname;
+
+  if (pathname.startsWith("/application/admin") && !(role === "ADMIN" || role === "ANALYZER")) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  if (
-    pathname.startsWith("/application/user") &&
-    !(role === "ADMIN" || role === "ANALYZER" || role === "USER")
-  ) {
+  if (pathname.startsWith("/application/user") && !(role === "ADMIN" || role === "ANALYZER" || role === "USER")) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
@@ -34,5 +32,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/application/:path*"], // protect all under /application
+  matcher: ["/application/:path*"],
 };

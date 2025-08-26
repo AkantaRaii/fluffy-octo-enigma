@@ -6,15 +6,18 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 export default function InputField() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -23,12 +26,12 @@ export default function InputField() {
         redirect: false,
         email,
         password,
-        callbackUrl: "/",
+        callbackUrl,
       });
 
       if (response?.ok) {
         toast.success("Logged in successfully!");
-        router.push("/");
+        router.push(callbackUrl);
       } else {
         toast.error(response?.error || "Invalid credentials");
       }

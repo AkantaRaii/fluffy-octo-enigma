@@ -139,7 +139,7 @@ export default function ExamForm({
         </label>
         <input
           type="number"
-          min="1"
+          min="0"
           value={repeatAfterDays ?? ""}
           onChange={(e) => setRepeatAfterDays(e.target.value)}
           className="mt-1 w-full border border-gray-300 rounded-lg p-2"

@@ -30,4 +30,45 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "role", "phone", "is_verified", "department", "department_name"]
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "role",
+            "phone",
+            "is_verified",
+            "department",
+            "department_name",
+        ]
+
+
+
+# users/serializers.py
+class RegisterUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "password",
+            "first_name",
+            "last_name",
+            "role",
+            "phone",
+            "department",
+        ]
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            email=validated_data["email"],
+            password=validated_data["password"],
+            first_name=validated_data.get("first_name", ""),
+            last_name=validated_data.get("last_name", ""),
+            role=validated_data.get("role", "USER"),
+            phone=validated_data.get("phone", ""),
+            department=validated_data.get("department"),
+        )
+        return user

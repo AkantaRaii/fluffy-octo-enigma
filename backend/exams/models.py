@@ -53,8 +53,9 @@ class Exam(models.Model):
     instructions = models.TextField(blank=True)
     celery_task_id = models.CharField(max_length=255, blank=True, null=True)
     passing_score = models.PositiveIntegerField(default=60)
+    parent_exam=models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
     def clean(self):
-        now = timezone.now()
+        now = timezone.now() 
         if self.scheduled_end < now:
             self.is_active = False  # auto-deactivate past exams
         if self.scheduled_end <= self.scheduled_start:
@@ -77,7 +78,6 @@ class ExamQuestion(models.Model):
     total_questions = models.PositiveIntegerField(default=20)
     class Meta:
         ordering = ['order']    
-
 class ExamInvitation(models.Model):
     """Tracks who gets which exam."""
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
@@ -86,5 +86,6 @@ class ExamInvitation(models.Model):
     sent_at = models.DateTimeField(auto_now_add=True)
     token = models.CharField(max_length=100, unique=True)  # For secure exam links
     is_attempted = models.BooleanField(default=False)
+    occurrence = models.PositiveIntegerField(default=1)
     class Meta:
-        unique_together = ('exam', 'user')
+        unique_together = ('exam', 'user', 'occurrence')

@@ -267,7 +267,6 @@ class ExamStartAPIView(APIView):
             is_submitted=False,  # only ongoing attempts
             defaults={'ip_address': request.META.get('REMOTE_ADDR')}
         )
-
         # attmpt submit vaisakyo vane paudaina 
         if attempt.is_submitted:
             return Response({'error': 'Exam already submitted.'}, status=403)

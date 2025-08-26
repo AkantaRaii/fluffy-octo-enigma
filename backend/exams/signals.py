@@ -4,11 +4,12 @@ from django.utils import timezone
 from datetime import timedelta
 from celery import current_app
 from .models import Exam
-from .tasks import send_exam_reminder
+from .tasks import send_exam_reminder,create_next_exam_task
 import logging
+from .tasks import create_next_exam_task
 
 logger = logging.getLogger(__name__)
-
+CREATION_BUFFER_DAYS = 2
 @receiver(post_save, sender=Exam)
 def schedule_exam_reminder(sender, instance, created, **kwargs):
     try:
@@ -47,3 +48,27 @@ def remove_schedule(sender, instance, **kwargs):
             logger.info(f"Revoked task {instance.celery_task_id} after deleting exam {instance.id}")
     except Exception as e:
         logger.error(f"Failed to revoke task {instance.celery_task_id} after deleting exam {instance.id}: {e}")
+
+
+@receiver(post_save, sender=Exam)
+def schedule_next_exam(sender, instance, created, **kwargs):
+    from .tasks import create_next_exam_task
+    print("Signal triggered for scheduling next exam.")
+
+    # Revoke old task if repeat is removed
+    if not created and instance.celery_task_id and not instance.repeat_after_days:
+        current_app.control.revoke(instance.celery_task_id, terminate=True)
+        instance.celery_task_id = None
+        instance.save(update_fields=['celery_task_id'])
+
+    # Schedule new task on creation
+    if created and instance.repeat_after_days:
+        next_start = instance.scheduled_start + timedelta(days=instance.repeat_after_days)
+        creation_time = next_start - timedelta(days=CREATION_BUFFER_DAYS)
+
+        task = create_next_exam_task.apply_async(
+            args=[instance.id],
+            eta=creation_time
+        )
+        instance.celery_task_id = task.id
+        instance.save(update_fields=['celery_task_id'])

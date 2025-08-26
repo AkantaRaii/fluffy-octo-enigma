@@ -20,7 +20,7 @@ export default function QuestionCard({
       id={`q-${q.id}`}
       className="rounded-2xl border border-gray-300 bg-white shadow-sm"
     >
-      <div className="p-4 md:p-5">
+      <div className="p-4 md:p-5 select-none">
         <div className="mb-2 flex items-start justify-between gap-4">
           <h2 className="text-base md:text-lg font-semibold leading-snug">
             <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md bg-accent/10 text-sm font-medium accent">

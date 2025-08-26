@@ -10,7 +10,92 @@ class UserExamAttemptCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserExamAttempt
-        fields = ["id", "exam_id", "start_time", "end_time", "is_submitted"]
+        fields = ["id", "exam_id","status","score","is_submitted"]
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        exam_id = validated_data['exam_id']
+        exam = Exam.objects.get(id=exam_id)
+
+        # Get or create active attempt
+        attempt, _ = UserExamAttempt.objects.get_or_create(
+            user=user,
+            exam=exam,
+            is_submitted=False,
+        )
+        return attempt
+
+class UserResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserResponse
+        fields = ["id", "attempt", "question", "option", "responded_at", "is_correct"]
+        read_only_fields = ["id", "responded_at", "is_correct"]
+# ---- Response Bulk Save ----
+class UserResponseItemSerializer(serializers.Serializer):
+    question_id = serializers.IntegerField()
+    selected_option_ids = serializers.ListField(
+        child=serializers.IntegerField(), allow_empty=False
+    )
+
+
+class BulkUserResponseSerializer(serializers.Serializer):
+    attempt_id = serializers.IntegerField()
+    responses = UserResponseItemSerializer(many=True)
+
+    def create(self, validated_data):
+        attempt_id = validated_data["attempt_id"]
+        responses = validated_data["responses"]
+        user = self.context['request'].user
+
+        attempt = UserExamAttempt.objects.get(
+            id=attempt_id, user=user, is_submitted=False
+        )
+
+        user_responses = []
+        for r in responses:
+            qid = r["question_id"]
+            option_ids = r["selected_option_ids"]
+
+            # delete old responses for that question (upsert logic)
+            UserResponse.objects.filter(attempt=attempt, question_id=qid).delete()
+
+            for oid in option_ids:
+                is_correct = Option.objects.filter(id=oid, is_correct=True).exists()
+                resp = UserResponse.objects.create(
+                    attempt=attempt,
+                    question_id=qid,
+                    option_id=oid,
+                    is_correct=is_correct,
+                )
+                user_responses.append(resp)
+
+        return user_responses
+
+
+
+# made serailzer for the r      esults
+class QuestionResultSerializer(serializers.Serializer):
+    question_id = serializers.IntegerField()
+    question_text = serializers.CharField()
+    marks = serializers.FloatField()
+    weight = serializers.FloatField()
+    user_selected_options = serializers.ListField(child=serializers.CharField())
+    correct_options = serializers.ListField(child=serializers.CharField())
+    is_correct = serializers.BooleanField()
+
+# serializers.py
+from rest_framework import serializers
+from .models import UserExamAttempt, UserResponse
+from exams.models import Exam, Option
+from django.utils.timezone import now
+
+# ---- Attempt Create ----
+class UserExamAttemptCreateSerializer(serializers.ModelSerializer):
+    exam_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = UserExamAttempt
+        fields = ["id", "exam_id","status","score","is_submitted"]
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -93,17 +178,9 @@ class UserExamResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserExamAttempt
         fields = [
-            "id",
-            "exam",
-            "user",
-            "start_time",
-            "end_time",
-            "is_submitted",
-            "total_questions",
-            "correct_answers",
-            "obtained_marks",
-            "total_marks",
-            "questions",
+            "user", "exam", "score", "status", "submitted_at",
+            "total_questions", "correct_answers",
+            "obtained_marks", "total_marks", "questions"
         ]
 
     def get_total_questions(self, obj):

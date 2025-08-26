@@ -22,11 +22,6 @@ export default async function AdminLayout({
       icon: <Users size={18} />,
     },
     {
-      label: "Questions",
-      href: "/application/admin/questions",
-      icon: <FileQuestion size={18} />,
-    },
-    {
       label: "Exams",
       href: "/application/admin/exams",
       icon: <ClipboardList size={18} />,

@@ -4,7 +4,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import ExamInvitation
 import logging
-
+from .models import Exam
+from .utils import create_repeated_exam
 logger = logging.getLogger(__name__)
 
 @shared_task
@@ -16,7 +17,7 @@ def send_single_reminder(invitation_id):
             logger.warning(f"User {invitation.user.id} has no email.")
             return
 
-        unique_url = f"https://yourdomain.com/exams/start/{invitation.token}/"
+        unique_url = f"http://localhost:3000/application/user/upcoming/{invitation.exam_id}/{invitation.token}/"
         subject = f"Reminder: {invitation.exam.title}"
         message = (
             f"Hi {invitation.user.get_full_name() or invitation.user.username},\n\n"
@@ -40,3 +41,15 @@ def send_exam_reminder(exam_id):
     invitations = ExamInvitation.objects.filter(exam_id=exam_id)
     for invitation in invitations:
         send_single_reminder.delay(invitation.id)
+
+
+
+
+@shared_task
+def create_next_exam_task(exam_id):
+    print(f"Creating next exam for exam ID: {exam_id}")
+    try:
+        exam = Exam.objects.get(id=exam_id)
+        create_repeated_exam(exam)  # creates new exam, invitations, and sends mails
+    except Exam.DoesNotExist:
+        pass

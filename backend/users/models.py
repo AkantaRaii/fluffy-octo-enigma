@@ -42,7 +42,7 @@ class User(AbstractUser):
     null=True,
     blank=True,related_name='user_dept')
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     objects = CustomUserManager()  # <- Add this line!
 
