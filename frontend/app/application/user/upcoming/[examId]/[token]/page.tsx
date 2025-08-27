@@ -9,7 +9,6 @@ export default async function TokenPage({
   params: { examId: string; token: string };
 }) {
   const { examId, token } = params;
-
   try {
     // Fetch exam session
     const examSessionRes = await apiServer.get(`api/v1/exams/start/${token}/`);
@@ -24,7 +23,7 @@ export default async function TokenPage({
     // If backend signals already attempted
     if (userAttemptResponse.status === 400) {
       redirect(`/application/user/upcoming/result/${examId}`);
-    } 
+    }
     return <ExamDashboard exam={ExamSessionData} examId={examId} />;
   } catch (error: any) {
     console.error(
@@ -32,6 +31,9 @@ export default async function TokenPage({
       error?.response?.data || error.message
     );
     // Example: if token invalid → redirect to not found
+    if (error?.response?.status === 400) {
+      redirect(`/application/user/upcoming/result/${examId}`);
+    }
     if (error?.response?.status === 404) {
       redirect("/not-found");
     }

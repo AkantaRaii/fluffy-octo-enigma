@@ -31,6 +31,7 @@ export default function ExamDashboard({
   const storageKey = `exam-answers-${exam.attempt_id}`;
   const [answers, setAnswers] = useState<Record<number, number | number[]>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [summaryMode, setSummaryMode] = useState(false);
   useEffect(() => {
     const saved = localStorage.getItem(storageKey);
     if (saved) {
@@ -70,7 +71,13 @@ export default function ExamDashboard({
       return { ...prev, [qid]: next };
     });
   }
-
+  function handleContinue() {
+    if (exam.questions.length === answeredCount) {
+      setSummaryMode(true);
+    } else {
+      toast.error("Please answer all questions before continuing.");
+    }
+  }
   async function handleSubmit() {
     setSubmitting(true);
     if (exam.questions.length === answeredCount) {
@@ -102,7 +109,7 @@ export default function ExamDashboard({
             is_submitted: true,
           }
         );
-        
+
         console.log("Saved responses:", res.data);
         router.push(`/application/user/upcoming/result/${examId}`);
       } catch (err: any) {
@@ -145,13 +152,22 @@ export default function ExamDashboard({
               current={answeredCount}
               total={exam.questions.length}
             />
-            <button
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="rounded-xl px-4 py-2 text-sm font-medium text-white bg-accent hover:opacity-90 disabled:opacity-50"
-            >
-              {submitting ? "Submitting..." : "Submit"}
-            </button>
+            {summaryMode ? (
+              <button
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="rounded-xl px-4 py-2 text-sm font-medium text-white bg-accent hover:opacity-90 disabled:opacity-50 hover:cursor-pointer"
+              >
+                {submitting ? "Submitting..." : "Submit"}
+              </button>
+            ) : (
+              <button
+                onClick={handleContinue}
+                className="rounded-xl px-4 py-2 text-sm font-medium text-white bg-accent hover:opacity-90 disabled:opacity-50 hover:cursor-pointer"
+              >
+                Continue
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -164,6 +180,7 @@ export default function ExamDashboard({
               key={q.id}
               q={q}
               idx={idx}
+              summary={summaryMode}
               answers={answers}
               updateSingle={updateSingle}
               updateMulti={updateMulti}
@@ -188,13 +205,32 @@ export default function ExamDashboard({
               </div>
             </div>
             {/* <StatusPill started block /> */}
-            <button
-              onClick={handleSubmit}
-              disabled={submitting && exam.questions.length !== answeredCount}
-              className="mt-4 w-full rounded-xl px-4 py-2 text-sm font-medium text-white bg-accent hover:opacity-90 disabled:opacity-50"
-            >
-              {submitting ? "Submitting..." : "Submit Exam"}
-            </button>
+            {summaryMode ? (
+              <div className="flex flex-row gap-2">
+                <button
+                  onClick={handleSubmit}
+                  disabled={
+                    submitting && exam.questions.length !== answeredCount
+                  }
+                  className="mt-4 w-full rounded-xl px-4 py-2 text-sm font-medium text-white bg-accent hover:opacity-90 disabled:opacity-50 hover:cursor-pointer"
+                >
+                  {submitting ? "Submitting..." : "Submit Exam"}
+                </button>
+                <button
+                  onClick={() => setSummaryMode(false)}
+                  className="mt-4 w-full rounded-xl px-4 py-2 text-sm font-medium text-white bg-gray-500 hover:opacity-90 disabled:opacity-50 hover:cursor-pointer"
+                >
+                  Back
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleContinue}
+                className="mt-4 w-full rounded-xl px-4 py-2 text-sm font-medium text-white bg-accent hover:opacity-90 disabled:opacity-50 hover:cursor-pointer"
+              >
+                Continue
+              </button>
+            )}
           </div>
         </aside>
       </main>

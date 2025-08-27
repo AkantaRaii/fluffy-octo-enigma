@@ -30,6 +30,7 @@ export default function AddExam({
       setExams((prev) => [...prev, exam]);
       setAddExamForm(false);
 
+      toast.success("Exam created successfully!");
       // Only do extra calls if checkboxes ticked
       if (options) {
         const { addAllQuestions, addAllUsers } = options;
@@ -54,7 +55,6 @@ export default function AddExam({
           );
         }
       }
-      toast.success("Exam created successfully!");
     } catch (error) {
       toast.error("Failed to create exam. Please try again.");
       console.error("Create exam error:", error);

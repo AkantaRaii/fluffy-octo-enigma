@@ -82,16 +82,32 @@ export default function Table({
                   )}
                 </td>
                 <td className="py-3 px-4">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      row.is_active
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {row.is_active ? "UpComming" : "Passed"}
-                  </span>
+                  {(() => {
+                    const now = new Date();
+                    const start = new Date(row.scheduled_start);
+                    const end = new Date(row.scheduled_end);
+
+                    let status = "Upcoming";
+                    let style = "bg-blue-100 text-blue-700";
+
+                    if (now >= start && now <= end) {
+                      status = "Ongoing";
+                      style = "bg-green-100 text-green-700";
+                    } else if (now > end) {
+                      status = "Passed";
+                      style = "bg-yellow-100 text-yellow-700";
+                    }
+
+                    return (
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${style}`}
+                      >
+                        {status}
+                      </span>
+                    );
+                  })()}
                 </td>
+
                 <td className="py-3 px-4">{row.creator_email}</td>
                 <td className="py-3 px-4">{row.passing_score}</td>
                 <td className="py-3 px-4 text-gray-500 cursor-pointer">

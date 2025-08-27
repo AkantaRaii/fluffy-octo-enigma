@@ -84,7 +84,7 @@ export default function ExamResult({ attempt }: { attempt?: Attempt }) {
       </div>
 
       {/* Questions */}
-      {/* <div className="space-y-3">
+      <div className="space-y-3">
         {attempt.questions?.length ? (
           attempt.questions.map((q, index) => (
             <ExpandableQuestionCard
@@ -96,7 +96,7 @@ export default function ExamResult({ attempt }: { attempt?: Attempt }) {
         ) : (
           <p className="text-sm text-gray-500">No questions available</p>
         )}
-      </div> */}
+      </div>
     </div>
   );
 }
@@ -133,7 +133,7 @@ function ExpandableQuestionCard({
       </div>
 
       {/* Expanded View */}
-      {/* <AnimatePresence>
+      <AnimatePresence>
         {expanded && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
@@ -159,7 +159,7 @@ function ExpandableQuestionCard({
             </div>
           </motion.div>
         )}
-      </AnimatePresence> */}
+      </AnimatePresence>
     </motion.div>
   );
 }

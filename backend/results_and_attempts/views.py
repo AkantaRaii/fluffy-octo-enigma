@@ -81,6 +81,8 @@ class ExamResultViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ['exam','user']
 
     def get_queryset(self):
-        return UserExamAttempt.objects.filter(user=self.request.user)
-    # def get_queryset(self):
-    #     return UserExamAttempt.objects.filter)
+        user = self.request.user
+        if user.role in ["ADMIN", "ANALYZER"]:
+            return UserExamAttempt.objects.all()
+        return UserExamAttempt.objects.filter(user=user)
+

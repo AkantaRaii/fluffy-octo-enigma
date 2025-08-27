@@ -3,7 +3,7 @@ import apiServer from "@/utils/axiosServer";
 import Body from "./components/Body";
 import { ExamQuestion, Question } from "@/types/QuestionOption";
 import { Department } from "@/types/Depertment";
-
+import { format } from "date-fns";
 interface Props {
   params: { examId: string };
 }
@@ -44,11 +44,21 @@ export default async function page({ params }: Props) {
           </div>
           <div>
             <span className="font-semibold">Scheduled Start:</span>{" "}
-            {new Date(exam.scheduled_start).toLocaleString()}
+            <span className="font-medium text-gray-900">
+              {format(new Date(exam.scheduled_start), "MMM dd, yyyy")}
+            </span>{" "}
+            <span className="text-xs text-lime-800">
+              {format(new Date(exam.scheduled_start), "hh:mm a")}
+            </span>
           </div>
           <div>
             <span className="font-semibold">Scheduled End:</span>{" "}
-            {new Date(exam.scheduled_end).toLocaleString()}
+            <span className="font-medium text-gray-900">
+              {format(new Date(exam.scheduled_end), "MMM dd, yyyy")}
+            </span>{" "}
+            <span className="text-xs text-lime-800">
+              {format(new Date(exam.scheduled_end), "hh:mm a")}
+            </span>
           </div>
           <div>
             <span className="font-semibold">Duration:</span>{" "}
