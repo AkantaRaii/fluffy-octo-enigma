@@ -6,25 +6,23 @@ from django.utils.timezone import now
 
 # ---- Attempt Create ----
 class UserExamAttemptCreateSerializer(serializers.ModelSerializer):
-    exam_id = serializers.IntegerField(write_only=True)
-
+    exam_id = serializers.IntegerField(write_only=True)  # input only
     class Meta:
         model = UserExamAttempt
-        fields = ["id", "exam_id","status","score","is_submitted"]
+        fields = ["id", "exam_id", "status", "score", "is_submitted"]
+        read_only_fields = ["id", "status", "score", "is_submitted"]
 
     def create(self, validated_data):
-        user = self.context['request'].user
-        exam_id = validated_data['exam_id']
-        exam = Exam.objects.get(id=exam_id)
+        request = self.context.get("request")
+        user = request.user
+        exam_id = validated_data.pop("exam_id")
+        try:
+            exam = Exam.objects.get(id=exam_id)
+        except Exam.DoesNotExist:
+            raise serializers.ValidationError({"exam_id": "Exam not found."})
 
-        # Get or create active attempt
-        attempt, _ = UserExamAttempt.objects.get_or_create(
-            user=user,
-            exam=exam,
-            is_submitted=False,
-        )
-        return attempt
-
+        # Note: existing attempt check is handled in ViewSet, so here we just create
+        return UserExamAttempt.objects.create(user=user, exam=exam, **validated_data)
 class UserResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserResponse

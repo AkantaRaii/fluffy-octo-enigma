@@ -4,7 +4,6 @@ import ProgressPill from "./ProgressPill";
 import QuestionCard from "./QuestionCard";
 import apiClient from "@/utils/axiosClient";
 import { useRouter } from "next/navigation";
-import { a } from "motion/react-client";
 import toast from "react-hot-toast";
 type Option = { id: number; text: string };
 type QuestionType = "MCQ_SINGLE" | "MCQ_MULTI";
@@ -98,12 +97,12 @@ export default function ExamDashboard({
         );
         console.log(exam);
         const examRes = await apiClient.patch(
-          `/api/v1/exams/exams/${examId}/`,
+          `/api/v1/examsession/attempts/${exam.attempt_id}/`,
           {
-            is_active: false,
+            is_submitted: true,
           }
         );
-
+        
         console.log("Saved responses:", res.data);
         router.push(`/application/user/upcoming/result/${examId}`);
       } catch (err: any) {
@@ -171,7 +170,6 @@ export default function ExamDashboard({
             />
           ))}
         </section>
-
         <aside className="lg:col-span-2 lg:sticky lg:top-[72px] h-max space-y-4 w-full">
           <div className="rounded-2xl border border-gray-300 bg-white shadow-sm p-4">
             <h3 className="text-sm font-semibold mb-2">Overview</h3>
