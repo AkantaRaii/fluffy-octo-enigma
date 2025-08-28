@@ -3,19 +3,21 @@ import { useState } from "react";
 import ManageUserPage from "./ManageUserPage";
 import ManageQuestionPage from "./ManageQuestionPage";
 import { ExamQuestion } from "@/types/QuestionOption";
-import { Exam, ExamInvitation } from "@/types/Exam";
+import { Exam, ExamAttempt, ExamInvitation } from "@/types/Exam";
 import { Department } from "@/types/Depertment";
 interface Props {
   examQuestions: ExamQuestion[];
   exam: Exam;
   departments: Department[];
   examInvitations: ExamInvitation[];
+  examAttempts: ExamAttempt[];
 }
 export default function Body({
   examQuestions,
   exam,
   departments,
   examInvitations,
+  examAttempts
 }: Props) {
   const [activeTab, setActiveTab] = useState<"users" | "questions">("users");
 
@@ -37,7 +39,7 @@ export default function Body({
             Manage Users
           </button>
           <button
-            onClick={() => setActiveTab("questions")} 
+            onClick={() => setActiveTab("questions")}
             className={`flex-1 px-4 py-2 w-[200px] rounded-md text-sm font-medium transition hover:cursor-pointer
               ${
                 activeTab === "questions"
@@ -60,7 +62,7 @@ export default function Body({
           />
         )}
         {activeTab === "users" && (
-          <ManageUserPage examInvitations={examInvitations} />
+          <ManageUserPage examInvitations={examInvitations} examAttempts={examAttempts}/>
         )}
       </div>
     </div>

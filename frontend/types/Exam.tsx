@@ -26,3 +26,18 @@ export interface ExamInvitation {
   token: string;
   is_attempted: boolean;
 }
+export interface ExamAttempt {
+  id: number;
+  user: {
+    id: number;
+    email: string;
+  };
+  exam: {
+    id: number;
+    title: string;
+    passing_score: number;
+  };
+  status: "passed" | "failed" | string; // extend if you have more statuses
+  score: number;
+  is_submitted: boolean;
+}

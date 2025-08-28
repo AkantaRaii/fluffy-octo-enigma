@@ -1,15 +1,25 @@
 "use client";
 import React from "react";
-import { FilePenLine, Trash } from "lucide-react";
+import { FilePenLine, Trash, CheckCircle } from "lucide-react";
 import { User } from "@/types/User";
-
+import { useModal } from "@/context/ModalContext";
 interface TableProps {
   data: User[];
   onEdit?: (user: User) => void;
   onDelete?: (user: User) => void;
+  onVerify?: (user: User) => void;
 }
 
-export default function UserTable({ data, onEdit, onDelete }: TableProps) {
+export default function UserTable({
+  data,
+  onEdit,
+  onDelete,
+  onVerify,
+}: TableProps) {
+  const { showModal } = useModal();
+  const handleVerify = () => {
+    console.log("verified confirmed");
+  };
   return (
     <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
       <table className="min-w-full border-collapse">
@@ -43,17 +53,17 @@ export default function UserTable({ data, onEdit, onDelete }: TableProps) {
               {/* Phone */}
               <td className="py-3 px-4">{user.phone}</td>
 
-              {/* Verified Pill */}
+              {/* Verified */}
               <td className="py-3 px-4">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    user.is_verified
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {user.is_verified ? "Verified" : "Unverified"}
-                </span>
+                {user.is_verified ? (
+                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                    Verified
+                  </span>
+                ) : (
+                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                    Unverified
+                  </span>
+                )}
               </td>
 
               {/* Department */}
@@ -66,23 +76,46 @@ export default function UserTable({ data, onEdit, onDelete }: TableProps) {
               {/* Actions */}
               <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center gap-2">
-                  {/* Edit */}
+                  {/* Verify button (always present) */}
                   <button
+                    title={
+                      user.is_verified ? "Already Verified" : "Verify User"
+                    }
+                    className={`p-2 rounded-full transition ${
+                      user.is_verified
+                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        : "hover:bg-green-100 text-green-600"
+                    }`}
+                    disabled={user.is_verified}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      showModal(() => handleVerify(), {
+                        title: "Verify Confirmation",
+                        message: `Are you sure you want to verify this user: ${user.email}?`,
+                        confirmLabel: "Delete",
+                      });
+                    }}
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                  </button>
+
+                  {/* Edit */}
+                  {/* <button
                     title="Edit User"
                     className="p-2 rounded-full hover:bg-gray-200 transition"
                     onClick={() => onEdit?.(user)}
                   >
                     <FilePenLine className="w-4 h-4 text-gray-600" />
-                  </button>
+                  </button> */}
 
                   {/* Delete */}
-                  <button
+                  {/* <button
                     title="Delete User"
                     className="p-2 rounded-full hover:bg-gray-200 transition"
                     onClick={() => onDelete?.(user)}
                   >
                     <Trash className="w-4 h-4 text-red-600" />
-                  </button>
+                  </button> */}
                 </div>
               </td>
             </tr>

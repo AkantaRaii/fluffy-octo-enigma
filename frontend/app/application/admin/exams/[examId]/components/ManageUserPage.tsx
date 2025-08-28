@@ -1,11 +1,12 @@
 "use client";
-import { ExamInvitation } from "@/types/Exam";
+import { ExamAttempt, ExamInvitation } from "@/types/Exam";
 import UserInvitationTable from "./UserTable";
 import { useState } from "react";
 interface Props {
   examInvitations: ExamInvitation[];
+  examAttempts: ExamAttempt[];
 }
-export default function ManageUserPage({ examInvitations }: Props) {
+export default function ManageUserPage({ examInvitations,examAttempts }: Props) {
   const [examInvitationsList, setExamInvitationsList] =
     useState<ExamInvitation[]>(examInvitations);
   return (
@@ -14,6 +15,7 @@ export default function ManageUserPage({ examInvitations }: Props) {
       <UserInvitationTable
         examInvitations={examInvitationsList}
         setInvitations={setExamInvitationsList}
+        examAttempts={examAttempts}
       />
     </div>
   );

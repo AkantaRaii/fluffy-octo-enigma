@@ -1,4 +1,5 @@
-import axios from "@/utils/axios";
+import api from "@/utils/axios";
+import axios, { isAxiosError } from "axios";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getServerSession } from "next-auth/next";
@@ -38,7 +39,7 @@ export const authOptions = {
       },
       async authorize(credentials) {
         try {
-          const res = await axios.post(
+          const res = await api.post(
             `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/token/`,
             {
               email: credentials?.email,
@@ -58,15 +59,19 @@ export const authOptions = {
           } else {
             return null; // Return null if no data is received
           }
-        } catch (err) {
-          throw Error("Invalid credentials");
+        } catch (err: any) {
+          if (axios.isAxiosError(err)) {
+            const backendMessage = err.response?.data?.detail || "Login failed";
+            throw new Error(backendMessage); // pass backend error to frontend
+          }
+          throw new Error("Unexpected error occurred");
         }
       },
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: "jwt" as const, // ✅ now TS recognizes this is a valid literal
+    strategy: "jwt" as const, // use JWT strategy
   },
   callbacks: {
     async jwt({

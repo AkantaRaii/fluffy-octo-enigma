@@ -96,24 +96,25 @@ export default function ExamDashboard({
             };
           }),
         };
+
         console.log("Submitting:", payload);
-        // send with apiClient
-        const res = await apiClient.post(
+
+        // Save responses
+        await apiClient.post(
           "/api/v1/examsession/responses/bulk_save/",
           payload
         );
-        console.log(exam);
-        const examRes = await apiClient.patch(
-          `/api/v1/examsession/attempts/${exam.attempt_id}/`,
-          {
-            is_submitted: true,
-          }
+
+        // Finalize attempt
+        const examRes = await apiClient.post(
+          `/api/v1/examsession/attempts/${exam.attempt_id}/submit/`
         );
 
-        console.log("Saved responses:", res.data);
+        console.log("Finalized exam:", examRes.data);
+
         router.push(`/application/user/upcoming/result/${examId}`);
       } catch (err: any) {
-        console.error("Bulk save error:", err.response?.data || err.message);
+        console.error("Submit error:", err.response?.data || err.message);
       } finally {
         setSubmitting(false);
       }

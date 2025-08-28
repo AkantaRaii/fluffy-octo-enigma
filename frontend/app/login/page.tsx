@@ -24,15 +24,17 @@ export default async function Login() {
     }
   }
   return (
-    <div className="h-screen grid sm:grid-cols-12 grid-cols-1">
-      <div className="md:col-span-7 relative shadow-neutral-800 md:block hidden">
-        <img
-          src="login.png"
-          alt="login"
-          className="col-span-2 h-screen w-full object-cover absolute top-0"
-        />
+    <div className="grid sm:grid-cols-12 grid-cols-1 h-screen">
+      <div className="sm:col-span-7   overflow-hidden p-20 md:block hidden">
+        <div className="p-20 w-full h-full flex justify-center items-center">
+          <img
+            src="./login_image.png"
+            alt="register image"
+            className="object-contain max-w-full max-h-full"
+          />
+        </div>
       </div>
-      <div className=" md:col-span-5 col-span-12 block">
+      <div className="md:col-span-5 col-span-12 block">
         <InputField />
       </div>
     </div>
