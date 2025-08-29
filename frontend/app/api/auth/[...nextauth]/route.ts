@@ -59,8 +59,10 @@ export const authOptions = {
           } else {
             return null; // Return null if no data is received
           }
+          console.log(res);
         } catch (err: any) {
           if (axios.isAxiosError(err)) {
+            console.log(err.response);
             const backendMessage = err.response?.data?.detail || "Login failed";
             throw new Error(backendMessage); // pass backend error to frontend
           }

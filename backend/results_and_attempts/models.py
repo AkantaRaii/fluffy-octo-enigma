@@ -45,4 +45,4 @@ class UserResponse(models.Model):
     option = models.ForeignKey(Option, on_delete=models.CASCADE, null=True, blank=True)
     text_answer = models.TextField(blank=True)
     responded_at = models.DateTimeField(auto_now_add=True)
-    is_correct = models.BooleanField(default=False)     
+    is_correct = models.BooleanField(default=False)

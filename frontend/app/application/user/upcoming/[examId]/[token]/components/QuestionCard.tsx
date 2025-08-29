@@ -105,7 +105,9 @@ export default function MinimalQuestionCard({
                         )}
                         <span
                           className={`leading-relaxed text-sm md:text-[15px] ${
-                            checked ? "font-medium text-lime-700" : "text-gray-700"
+                            checked
+                              ? "font-medium text-lime-700"
+                              : "text-gray-700"
                           }`}
                         >
                           {opt.text}

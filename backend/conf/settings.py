@@ -173,3 +173,13 @@ EMAIL_USE_TLS = True                  # use TLS encryption
 EMAIL_HOST_USER = "yakantaraaii@gmail.com"
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASS')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    "check-ended-exams-daily": {
+        "task": "exams.tasks.create_repeated_exams",
+        # "schedule": crontab(hour=0, minute=0), 
+        #  # run daily at midnight
+        "schedule": crontab(minute="*"),  # runs every minute
+    },
+}

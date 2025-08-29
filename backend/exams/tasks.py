@@ -6,6 +6,10 @@ from .models import ExamInvitation
 import logging
 from .models import Exam
 from .utils import create_repeated_exam
+from django.utils import timezone
+from datetime import timedelta
+from results_and_attempts.models import UserExamAttempt 
+
 logger = logging.getLogger(__name__)
 
 @shared_task
@@ -53,3 +57,46 @@ def create_next_exam_task(exam_id):
         create_repeated_exam(exam)  # creates new exam, invitations, and sends mails
     except Exam.DoesNotExist:
         pass
+
+@shared_task
+def create_repeated_exams():
+    now = timezone.now()
+    yesterday = now - timedelta(minutes=1)
+
+    ended_exams = Exam.objects.filter(
+        scheduled_end__gte=yesterday,
+        scheduled_end__lte=now,
+        parent_exam__isnull=True,
+    )
+    for exam in ended_exams:
+        next_start = exam.scheduled_start + timedelta(minutes=3)
+        next_end = exam.scheduled_end + timedelta(minutes=3)
+
+        failed = UserExamAttempt.objects.filter(exam=exam, status="failed")
+
+        exists = Exam.objects.filter(
+            parent_exam=exam,
+            scheduled_start=next_start
+        ).exists()
+
+        if not exists:
+            new_exam = Exam.objects.create(
+                title=exam.title+(" - Retake"),
+                department=exam.department,
+                creator=exam.creator,
+                duration_minutes=exam.duration_minutes,
+                scheduled_start=next_start,
+                scheduled_end=next_end,
+                repeat_after_days=exam.repeat_after_days,
+                parent_exam=exam,
+                instructions=exam.instructions,
+                passing_score=exam.passing_score
+            )
+
+             # Enroll failed students into new exam
+            for attempt in failed:
+                ExamInvitation.objects.create(
+                        user=attempt.user,
+                        exam=new_exam,
+                        added_by=exam.creator,   # original creator of the exam
+                        )

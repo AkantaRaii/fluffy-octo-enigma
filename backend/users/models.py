@@ -35,7 +35,7 @@ class User(AbstractUser):
     ]
     username = None 
     email = models.EmailField('email address', unique=True)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES,default='USER')
     phone = models.CharField(max_length=15, blank=True)
     is_verified = models.BooleanField(default=False)
     department = models.ForeignKey("exams.Department",on_delete=models.SET_NULL,

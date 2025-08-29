@@ -25,7 +25,7 @@ export default function UserTable({
       <table className="min-w-full border-collapse">
         <thead>
           <tr className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-            <th className="py-3 px-4">ID</th>
+            <th className="py-3 px-4">Name</th>
             <th className="py-3 px-4">Email</th>
             <th className="py-3 px-4">Role</th>
             <th className="py-3 px-4">Phone</th>
@@ -42,7 +42,9 @@ export default function UserTable({
               className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition"
             >
               {/* ID */}
-              <td className="py-3 px-4 font-medium">{user.id}</td>
+              <td className="py-3 px-4 font-semibold">
+                {user.first_name} {user.last_name}
+              </td>
 
               {/* Email */}
               <td className="py-3 px-4">{user.email}</td>

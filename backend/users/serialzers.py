@@ -8,22 +8,27 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         # Add custom claims
         token['email'] = user.email
-        # Remove username if you want, or keep it if you added it elsewhere
+        token['role'] = user.role
+        token['is_verified'] = user.is_verified
 
         return token
+
     def validate(self, attrs):
         data = super().validate(attrs)
 
-        # Optional: Add more user info to the response
+        # Check if user is verified before issuing token
+        if not self.user.is_verified:
+            raise serializers.ValidationError("Your account is not verified. Please verify to continue.")
+
+        # Add more user info to the response
         data['user'] = {
             'id': self.user.id,
             'email': self.user.email,
             'is_verified': self.user.is_verified,
-            'role':self.user.role
+            'role': self.user.role,
         }
 
         return data
-
 # users/serializers.py
 class UserSerializer(serializers.ModelSerializer):
     department_name = serializers.CharField(source="department.name", read_only=True)

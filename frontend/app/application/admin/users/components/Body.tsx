@@ -1,6 +1,6 @@
 "use client";
 import { User } from "@/types/User";
-import UserTable from "../../../../../../../components/UserTable";
+import UserTable from "@/components/UserTable";
 import { useState } from "react";
 interface Props {
   users: User[];

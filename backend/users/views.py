@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serialzers import *
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import generics
+from rest_framework import generics,filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import User
 from rest_framework.permissions import AllowAny
@@ -34,7 +34,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend,filters.SearchFilter,filters.OrderingFilter]
+    search_fields = ['first_name','last_name','email']
+    ordering_fields = ['id','first_name','last_name','email','role']
     filterset_fields = ["department"]   
 
 class RegisterUserView(generics.CreateAPIView):

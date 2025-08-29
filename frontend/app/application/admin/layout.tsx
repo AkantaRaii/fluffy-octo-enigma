@@ -2,7 +2,14 @@
 
 import Layout from "@/components/Layout";
 import { ModalProvider } from "@/context/ModalContext";
-import { Home, Users, FileQuestion, ClipboardList, Send } from "lucide-react";
+import {
+  Home,
+  Users,
+  FileQuestion,
+  ClipboardList,
+  Send,
+  Building,
+} from "lucide-react";
 import { getServerSession } from "next-auth";
 export default async function AdminLayout({
   children,
@@ -17,19 +24,19 @@ export default async function AdminLayout({
       icon: <Home size={18} />,
     },
     {
+      label: "Users",
+      href: "/application/admin/users",
+      icon: <Users size={18} />,
+    },
+    {
       label: "Departments",
       href: "/application/admin/departments",
-      icon: <Users size={18} />,
+      icon: <Building size={18} />,
     },
     {
       label: "Exams",
       href: "/application/admin/exams",
       icon: <ClipboardList size={18} />,
-    },
-    {
-      label: "Invitations",
-      href: "/application/admin/invitations",
-      icon: <Send size={18} />,
     },
   ];
 
