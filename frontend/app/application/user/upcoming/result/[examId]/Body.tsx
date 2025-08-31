@@ -3,7 +3,8 @@
 import ResultQuestionCard, { Question } from "@/components/ResultQuestionCard";
 
 interface Attempt {
-  user: { id: number; email: string };
+  user: { id: number; email: string; first_name: string; last_name: string };
+
   total_questions: number;
   correct_answers: number;
   obtained_marks: number;
@@ -25,13 +26,22 @@ export default function Body({ attempt }: Props) {
   return (
     <div className=" w-full p-4 md:p-6">
       {/* Summary */}
-      <div>
-        <div className="mb-6 border border-gray-300 rounded-xl p-6 shadow-sm bg-white">
-          <h1 className="text-2xl font-bold mb-2 text-center">
-            {attempt.user.email}
+      <div className="flex flex-row gap-4 justify-between">
+        <div className="mb-6 border border-gray-300 rounded-xl p-6 flex flex-col items-start shadow-sm bg-white w-full">
+          <h1 className="text-md font-bold mb-2 text-center">
+            Name:{" "}
+            <span className="font-semibold text-gray-600">
+              {attempt.user.first_name + " " + attempt.user.last_name}
+            </span>
+          </h1>
+          <h1 className="text-md font-bold mb-2 text-center">
+            Email:{" "}
+            <span className="font-semibold text-gray-600">
+              {attempt.user.email}
+            </span>
           </h1>
         </div>
-        <div className="mb-6 border border-gray-300 rounded-xl p-6 shadow-sm bg-white">
+        <div className="mb-6 border border-gray-300 rounded-xl p-6 shadow-sm bg-white w-full">
           <h2 className="text-xl font-semibold mb-4">Exam Result</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div className="flex flex-col gap justify-center items-center">

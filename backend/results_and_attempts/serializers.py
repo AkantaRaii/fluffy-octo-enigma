@@ -88,7 +88,7 @@ class QuestionResultSerializer(serializers.Serializer):
 class SafeUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email",]  # expose only what’s safe
+        fields = ["id", "email","first_name","last_name"]  # expose only what’s safe
 
 class ExamSerializer(serializers.ModelSerializer):
     class Meta:

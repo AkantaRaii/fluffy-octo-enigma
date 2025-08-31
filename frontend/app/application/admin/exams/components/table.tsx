@@ -48,7 +48,7 @@ export default function Table({
           {data.length === 0 ? (
             <tr>
               <td colSpan={9} className="py-6 text-center text-gray-500">
-                No exams found
+                There are no exams yet.
               </td>
             </tr>
           ) : (

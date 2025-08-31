@@ -44,53 +44,56 @@ export default function ResultQuestionCard({ q, idx }: Props) {
         </div>
 
         {/* Options */}
+        {/* Options */}
         <ul className="mt-3 space-y-2">
-          {q.options.map((opt) => {
-            const checked = opt.is_selected;
+          {q.options
+            .filter((opt) => opt.is_selected || opt.is_correct) // only guessed or correct
+            .map((opt) => {
+              const checked = opt.is_selected;
 
-            return (
-              <li key={opt.id}>
-                <label
-                  className={`flex items-start gap-3 rounded-xl border px-3 py-2 cursor-pointer transition
-                    ${
-                      checked
-                        ? "border-lime-500 bg-lime-50"
-                        : "border-gray-200 bg-white "
-                    }
-                  `}
-                >
-                  {q.type === "MCQ_SINGLE" ? (
-                    <input
-                      type="radio"
-                      name={`q-${q.id}`}
-                      className="mt-1 text-lime-600 focus:ring-lime-500"
-                      checked={checked}
-                      readOnly
-                    />
-                  ) : (
-                    <input
-                      type="checkbox"
-                      className="mt-1 text-lime-600 focus:ring-lime-500"
-                      checked={checked}
-                      readOnly
-                    />
-                  )}
-                  <span
-                    className={`leading-relaxed text-sm md:text-[15px] ${
-                      checked ? "font-medium text-lime-700" : "text-gray-700"
-                    }`}
+              return (
+                <li key={opt.id}>
+                  <label
+                    className={`flex items-start gap-3 rounded-xl border px-3 py-2 cursor-pointer transition
+              ${
+                checked
+                  ? "border-lime-500 bg-lime-50"
+                  : "border-gray-200 bg-white "
+              }
+            `}
                   >
-                    {opt.text}
-                    {opt.is_correct && (
-                      <span className="ml-2 text-xs text-green-600">
-                        (Correct)
-                      </span>
+                    {q.type === "MCQ_SINGLE" ? (
+                      <input
+                        type="radio"
+                        name={`q-${q.id}`}
+                        className="mt-1 text-lime-600 focus:ring-lime-500"
+                        checked={checked}
+                        readOnly
+                      />
+                    ) : (
+                      <input
+                        type="checkbox"
+                        className="mt-1 text-lime-600 focus:ring-lime-500"
+                        checked={checked}
+                        readOnly
+                      />
                     )}
-                  </span>
-                </label>
-              </li>
-            );
-          })}
+                    <span
+                      className={`leading-relaxed text-sm md:text-[15px] ${
+                        checked ? "font-medium text-lime-700" : "text-gray-700"
+                      }`}
+                    >
+                      {opt.text}
+                      {opt.is_correct && (
+                        <span className="ml-2 text-xs text-green-600">
+                          (Correct)
+                        </span>
+                      )}
+                    </span>
+                  </label>
+                </li>
+              );
+            })}
         </ul>
       </div>
     </article>

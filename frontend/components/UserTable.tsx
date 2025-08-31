@@ -1,25 +1,46 @@
 "use client";
-import React from "react";
-import { FilePenLine, Trash, CheckCircle } from "lucide-react";
+import React, { useState } from "react";
+import { CheckCircle } from "lucide-react";
 import { User } from "@/types/User";
 import { useModal } from "@/context/ModalContext";
+import apiClient from "@/utils/axiosClient";
+import toast from "react-hot-toast";
+
 interface TableProps {
   data: User[];
   onEdit?: (user: User) => void;
   onDelete?: (user: User) => void;
-  onVerify?: (user: User) => void;
 }
 
-export default function UserTable({
-  data,
-  onEdit,
-  onDelete,
-  onVerify,
-}: TableProps) {
+export default function UserTable({ data, onEdit, onDelete }: TableProps) {
+  // Local state for users so we can update immediately
+  const [users, setUsers] = useState<User[]>(data);
   const { showModal } = useModal();
-  const handleVerify = () => {
-    console.log("verified confirmed");
+
+  const handleVerify = async (userId: number) => {
+    try {
+      const res = await apiClient.patch(`api/v1/auth/users/${userId}/`, {
+        is_verified: true,
+      });
+
+      if (res.status === 200) {
+        toast.success("User verified successfully");
+
+        // Update state so UI reflects immediately
+        setUsers((prev) =>
+          prev.map((u) =>
+            u.id === userId ? { ...u, is_verified: true } : u
+          )
+        );
+      } else {
+        toast.error("Failed to verify user");
+      }
+    } catch (error) {
+      toast.error("Failed to verify user");
+      console.error("Error verifying user:", error);
+    }
   };
+
   return (
     <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
       <table className="min-w-full border-collapse">
@@ -36,12 +57,12 @@ export default function UserTable({
         </thead>
 
         <tbody className="text-sm text-gray-700">
-          {data.map((user) => (
+          {users.map((user) => (
             <tr
               key={user.id}
               className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition"
             >
-              {/* ID */}
+              {/* Name */}
               <td className="py-3 px-4 font-semibold">
                 {user.first_name} {user.last_name}
               </td>
@@ -78,7 +99,7 @@ export default function UserTable({
               {/* Actions */}
               <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center gap-2">
-                  {/* Verify button (always present) */}
+                  {/* Verify button */}
                   <button
                     title={
                       user.is_verified ? "Already Verified" : "Verify User"
@@ -91,33 +112,17 @@ export default function UserTable({
                     disabled={user.is_verified}
                     onClick={(e) => {
                       e.stopPropagation();
-                      showModal(() => handleVerify(), {
+                      showModal(() => handleVerify(user.id), {
                         title: "Verify Confirmation",
-                        message: `Are you sure you want to verify this user: ${user.email}?`,
-                        confirmLabel: "Delete",
+                        message: `Are you sure you want to verify ${
+                          user.first_name + " " + user.last_name
+                        }?`,
+                        confirmLabel: "Verify",
                       });
                     }}
                   >
                     <CheckCircle className="w-4 h-4" />
                   </button>
-
-                  {/* Edit */}
-                  {/* <button
-                    title="Edit User"
-                    className="p-2 rounded-full hover:bg-gray-200 transition"
-                    onClick={() => onEdit?.(user)}
-                  >
-                    <FilePenLine className="w-4 h-4 text-gray-600" />
-                  </button> */}
-
-                  {/* Delete */}
-                  {/* <button
-                    title="Delete User"
-                    className="p-2 rounded-full hover:bg-gray-200 transition"
-                    onClick={() => onDelete?.(user)}
-                  >
-                    <Trash className="w-4 h-4 text-red-600" />
-                  </button> */}
                 </div>
               </td>
             </tr>

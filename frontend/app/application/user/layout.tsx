@@ -12,7 +12,7 @@ export default async function UserLayout({
   const menuItems = [
     { label: "Dashboard", href: "/application/user", icon: <Home size={18} /> },
     {
-      label: "Upcoming Exams",
+      label: "Exams",
       href: "/application/user/upcoming",
       icon: <Clock size={18} />,
     },

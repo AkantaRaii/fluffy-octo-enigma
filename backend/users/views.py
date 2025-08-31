@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serialzers import *
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import generics,filters
+from rest_framework import filters,viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import User
 from rest_framework.permissions import AllowAny
@@ -31,15 +31,15 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 # users/views.py
 
 
-class UserListView(generics.ListAPIView):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-    filter_backends = [DjangoFilterBackend,filters.SearchFilter,filters.OrderingFilter]
-    search_fields = ['first_name','last_name','email']
-    ordering_fields = ['id','first_name','last_name','email','role']
-    filterset_fields = ["department"]   
+    serializer_class = UserSerializer  # or dynamically pick based on action
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['first_name', 'last_name', 'email']
+    ordering_fields = ['id', 'first_name', 'last_name', 'email', 'role']
+    filterset_fields = ['department']
 
-class RegisterUserView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    permission_classes = [AllowAny]  # anyone can register
-    serializer_class = RegisterUserSerializer
+    def get_permissions(self):
+        if self.action == 'create':  # register
+            return [AllowAny()]
+        return [IsAuthenticated()]

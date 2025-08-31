@@ -16,7 +16,6 @@ export default async function () {
 
   return (
     <div>
-      <h1 className="py-4 font-semibold text-xl">Departments</h1>
       <Table data={departments} />
     </div>
   );
