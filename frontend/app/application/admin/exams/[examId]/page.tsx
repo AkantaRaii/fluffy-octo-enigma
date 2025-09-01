@@ -9,7 +9,7 @@ interface Props {
 }
 export default async function page({ params }: Props) {
   //exam id from parameter
-  const examId = await params.examId;
+  const examId = params.examId;
   const examRes = await apiServer.get(`/api/v1/exams/exams/${examId}/`);
   const exam: Exam = examRes.data;
 

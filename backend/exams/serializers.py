@@ -132,3 +132,24 @@ class QuestionWithSafeOptionsSerializer(serializers.ModelSerializer):
 
     def get_department_names(self, obj):
         return [dept.name for dept in obj.departments.all()]
+    
+
+
+
+# Serializers for Dashboard Data
+class UserDashboardSerializer(serializers.Serializer):
+    total_exams = serializers.IntegerField()
+    completed = serializers.IntegerField()
+    pending = serializers.IntegerField()
+    avg_score = serializers.FloatField()
+    passed = serializers.IntegerField()
+    failed = serializers.IntegerField()
+    last_attempts = serializers.ListField()
+
+class AdminDashboardSerializer(serializers.Serializer):
+    total_exams = serializers.IntegerField()
+    active_exams = serializers.IntegerField()
+    total_users = serializers.IntegerField()
+    pending_attempts = serializers.IntegerField()
+    recent_attempts = serializers.ListField()
+    department_stats = serializers.ListField()

@@ -41,6 +41,8 @@ class User(AbstractUser):
     department = models.ForeignKey("exams.Department",on_delete=models.SET_NULL,
     null=True,
     blank=True,related_name='user_dept')
+    otp=models.CharField(max_length=6,null=True,blank=True)
+    otp_expiry = models.DateTimeField(null=True, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ["first_name", "last_name"]
 

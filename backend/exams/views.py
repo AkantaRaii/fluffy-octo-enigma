@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import viewsets,permissions,filters
+from rest_framework import viewsets,filters
 from .models import *
 from .serializers import *
 from django.db import transaction
@@ -16,6 +16,9 @@ from .services import (
     assign_random_questions_to_exam,
     invite_department_users_for_exam,
 )
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Count, Avg, Sum,Q  # add others if needed
+
 # Create your views here.
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset=Department.objects.all()
@@ -286,3 +289,86 @@ class ExamStartAPIView(APIView):
             "attempt_id": attempt.id,
             "questions": serializer.data
         })
+    
+
+
+# ---------------- User Dashboard -----------------
+class UserDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        # Total assigned exams
+        assigned = ExamInvitation.objects.filter(user=user, exam__is_active=True)
+        total_exams = assigned.count()
+
+        # Completed / Pending attempts
+        attempts = UserExamAttempt.objects.filter(user=user, is_submitted=True)
+        completed = attempts.count()
+        pending = total_exams - completed
+
+        # Avg score
+        avg_score = attempts.aggregate(avg=Avg('score'))['avg'] or 0
+
+        # Pass / fail counts
+        passed = attempts.filter(status='passed').count()
+        failed = attempts.filter(status='failed').count()
+
+        # Last 5 attempts summary
+        last_attempts = attempts.order_by('-submitted_at')[:5].values(
+            'exam__title', 'score', 'status', 'submitted_at'
+        )
+
+        data = {
+            "total_exams": total_exams,
+            "completed": completed,
+            "pending": pending,
+            "avg_score": round(avg_score, 2),
+            "passed": passed,
+            "failed": failed,
+            "last_attempts": list(last_attempts),
+        }
+
+        serializer = UserDashboardSerializer(data)
+        return Response(serializer.data)
+
+
+# ---------------- Admin Dashboard -----------------
+class AdminDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user.role != 'ADMIN':
+            return Response({"detail": "Unauthorized"}, status=403)
+
+        total_exams = Exam.objects.count()
+        active_exams = Exam.objects.filter(is_active=True).count()
+        total_users = User.objects.count()
+
+        # Pending attempts
+        pending_attempts = UserExamAttempt.objects.filter(is_submitted=False).count()
+
+        # Recent 5 attempts
+        recent_attempts = UserExamAttempt.objects.filter(is_submitted=True).order_by('-submitted_at')[:5].values(
+            'user__email', 'exam__title', 'score', 'status', 'submitted_at'
+        )
+
+        # Department-wise stats: total exams and active exams per department
+        department_stats = Department.objects.annotate(
+            total_exams=Count('exam'),
+            active_exams=Count('exam', filter=Q(exam__is_active=True))
+        ).values('name', 'total_exams', 'active_exams')
+
+        data = {
+            "total_exams": total_exams,
+            "active_exams": active_exams,
+            "total_users": total_users,
+            "pending_attempts": pending_attempts,
+            "recent_attempts": list(recent_attempts),
+            "department_stats": list(department_stats),
+        }
+
+        serializer = AdminDashboardSerializer(data)
+        return Response(serializer.data)

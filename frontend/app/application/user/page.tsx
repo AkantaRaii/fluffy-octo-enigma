@@ -1,3 +1,9 @@
-export default function Page(){
-    return <div>asdlfad</div>
+import apiServer from "@/utils/axiosServer";
+import Body from "./Body";
+
+export default async function Page() {
+  const res = await apiServer.get("/api/v1/exams/dashboard/user/");
+  const data = res.data;
+
+  return <Body data={data} />;
 }

@@ -14,4 +14,6 @@ router.register(r'examinvitations', ExamInvitationViewSet, basename="examinvitat
 urlpatterns = [
     path('start/<str:token>/', ExamStartAPIView.as_view(), name='exam-start'),  # custom APIView URL
     path('', include(router.urls)),  # include all router URLs under 'api/'
+    path("dashboard/user/", UserDashboardView.as_view(), name="dashboard-user"),
+    path("dashboard/admin/", AdminDashboardView.as_view(), name="dashboard-admin"),
 ]
