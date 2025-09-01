@@ -27,7 +27,7 @@ export default function InputField() {
         password,
         callbackUrl,
       });
-      console.log(response);
+
       if (response?.ok) {
         toast.success("Logged in successfully!");
         router.push(callbackUrl);
@@ -38,6 +38,15 @@ export default function InputField() {
       toast.error("Login failed. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = () => {
+    const userEmail = prompt("Enter your email to reset password:");
+    if (userEmail) {
+      router.push(`/veryy?email=${encodeURIComponent(userEmail)}`);
+    } else {
+      toast.info("Email is required to proceed.");
     }
   };
 
@@ -96,7 +105,9 @@ export default function InputField() {
 
         {/* Forgot password */}
         <div className="w-full flex flex-row justify-end underline text-sm text-warningAction">
-          <Link href={"/login/forgotpassword"}>Forgot Password?</Link>
+          <button type="button" onClick={handleForgotPassword}>
+            Forgot Password?
+          </button>
         </div>
 
         {/* Submit */}

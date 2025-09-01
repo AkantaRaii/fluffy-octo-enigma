@@ -41,12 +41,13 @@ class User(AbstractUser):
     department = models.ForeignKey("exams.Department",on_delete=models.SET_NULL,
     null=True,
     blank=True,related_name='user_dept')
-    otp=models.CharField(max_length=6,null=True,blank=True)
-    otp_expiry = models.DateTimeField(null=True, blank=True)
+    otp = models.CharField(max_length=6, blank=True, null=True)
+    otp_expiry = models.DateTimeField(blank=True, null=True)
+    otp_verified = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
-    objects = CustomUserManager()  # <- Add this line!
+    objects = CustomUserManager()
 
     def __str__(self):
         return self.email

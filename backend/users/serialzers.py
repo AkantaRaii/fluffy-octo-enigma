@@ -47,33 +47,14 @@ class UserSerializer(serializers.ModelSerializer):
             "department_name",
         ]
 
+class VerifyOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=6)
 
 
-# users/serializers.py
-class RegisterUserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+class ResetPasswordRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
 
-    class Meta:
-        model = User
-        fields = [
-            "id",
-            "email",
-            "password",
-            "first_name",
-            "last_name",
-            "role",
-            "phone",
-            "department",
-        ]
-
-    def create(self, validated_data):
-        user = User.objects.create_user(
-            email=validated_data["email"],
-            password=validated_data["password"],
-            first_name=validated_data.get("first_name", ""),
-            last_name=validated_data.get("last_name", ""),
-            role=validated_data.get("role", "USER"),
-            phone=validated_data.get("phone", ""),
-            department=validated_data.get("department"),
-        )
-        return user
+class ResetPasswordConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField()  # short-lived reset token
+    new_password = serializers.CharField(write_only=True, min_length=8)

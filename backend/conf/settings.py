@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'users',
     'exams',
     'results_and_attempts',
+    "channels",
 ]
 
 MIDDLEWARE = [

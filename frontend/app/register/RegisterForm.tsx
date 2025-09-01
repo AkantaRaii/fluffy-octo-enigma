@@ -98,7 +98,7 @@ export default function RegisterForm({ departments }: Props) {
       last_name: form.lastName,
       department: form.department,
     };
-    const res = await apiClient.post("/api/v1/auth/register/", payload);
+    const res = await apiClient.post("/api/v1/auth/users/", payload);
     const responseData = res.data;
     if (res.status !== 201) {
       toast.error(responseData?.message || "Registration failed. Try again.");
@@ -106,8 +106,7 @@ export default function RegisterForm({ departments }: Props) {
       return;
     }
     console.log(payload);
-    toast.success("Account created! Please log in.");
-    router.push("/login");
+    router.push(`/register/verify?email=${encodeURIComponent(payload.email)}`);
   }
 
   return (
