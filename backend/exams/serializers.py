@@ -150,6 +150,6 @@ class AdminDashboardSerializer(serializers.Serializer):
     total_exams = serializers.IntegerField()
     active_exams = serializers.IntegerField()
     total_users = serializers.IntegerField()
-    pending_attempts = serializers.IntegerField()
+    pass_rate = serializers.FloatField() 
     recent_attempts = serializers.ListField()
     department_stats = serializers.ListField()

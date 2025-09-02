@@ -115,8 +115,6 @@ export default function ExamDashboard({
         router.push(`/application/user/upcoming/result/${examId}`);
       } catch (err: any) {
         console.error("Submit error:", err.response?.data || err.message);
-      } finally {
-        setSubmitting(false);
       }
     } else {
       toast.error("Please answer all questions before submitting.");
@@ -209,6 +207,12 @@ export default function ExamDashboard({
             {summaryMode ? (
               <div className="flex flex-row gap-2">
                 <button
+                  onClick={() => setSummaryMode(false)}
+                  className="mt-4 w-full rounded-xl px-4 py-2 text-sm font-medium text-white bg-gray-500 hover:opacity-90 disabled:opacity-50 hover:cursor-pointer"
+                >
+                  Back
+                </button>
+                <button
                   onClick={handleSubmit}
                   disabled={
                     submitting && exam.questions.length !== answeredCount
@@ -216,12 +220,6 @@ export default function ExamDashboard({
                   className="mt-4 w-full rounded-xl px-4 py-2 text-sm font-medium text-white bg-accent hover:opacity-90 disabled:opacity-50 hover:cursor-pointer"
                 >
                   {submitting ? "Submitting..." : "Submit Exam"}
-                </button>
-                <button
-                  onClick={() => setSummaryMode(false)}
-                  className="mt-4 w-full rounded-xl px-4 py-2 text-sm font-medium text-white bg-gray-500 hover:opacity-90 disabled:opacity-50 hover:cursor-pointer"
-                >
-                  Back
                 </button>
               </div>
             ) : (

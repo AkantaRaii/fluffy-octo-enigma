@@ -13,10 +13,12 @@ export default function StatCard({
     <div className="rounded-xl bg-white shadow-sm p-5 flex flex-col items-center text-center">
       <h3 className="text-sm text-gray-500">{title}</h3>
       <p className="mt-2 text-2xl font-bold text-gray-900">{value}</p>
-      {href && (
+      {href ? (
         <Link href={href} className="mt-3 text-sm text-theme hover:underline">
           View Details →
         </Link>
+      ) : (
+        <div className="mt-3 text-sm text-gray-300 select-none">—</div>
       )}
     </div>
   );

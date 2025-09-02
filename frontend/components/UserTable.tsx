@@ -5,6 +5,7 @@ import { User } from "@/types/User";
 import { useModal } from "@/context/ModalContext";
 import apiClient from "@/utils/axiosClient";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface TableProps {
   data: User[];
@@ -13,6 +14,7 @@ interface TableProps {
 }
 
 export default function UserTable({ data, onEdit, onDelete }: TableProps) {
+  const router = useRouter();
   // Local state for users so we can update immediately
   const [users, setUsers] = useState<User[]>(data);
   const { showModal } = useModal();
@@ -28,9 +30,7 @@ export default function UserTable({ data, onEdit, onDelete }: TableProps) {
 
         // Update state so UI reflects immediately
         setUsers((prev) =>
-          prev.map((u) =>
-            u.id === userId ? { ...u, is_verified: true } : u
-          )
+          prev.map((u) => (u.id === userId ? { ...u, is_verified: true } : u))
         );
       } else {
         toast.error("Failed to verify user");
@@ -45,7 +45,7 @@ export default function UserTable({ data, onEdit, onDelete }: TableProps) {
     <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
       <table className="min-w-full border-collapse">
         <thead>
-          <tr className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+          <tr className="bg-gray-200 text-left text-sm font-semibold text-gray-700">
             <th className="py-3 px-4">Name</th>
             <th className="py-3 px-4">Email</th>
             <th className="py-3 px-4">Role</th>
@@ -59,8 +59,11 @@ export default function UserTable({ data, onEdit, onDelete }: TableProps) {
         <tbody className="text-sm text-gray-700">
           {users.map((user) => (
             <tr
+              onClick={() => {
+                router.push(`/application/admin/users/exams/${user.id}`);
+              }}
               key={user.id}
-              className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition"
+              className="border-b border-gray-200 last:border-b-0 hover:cursor-pointer hover:bg-gray-100 transition"
             >
               {/* Name */}
               <td className="py-3 px-4 font-semibold">

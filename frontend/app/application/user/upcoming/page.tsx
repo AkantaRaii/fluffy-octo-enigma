@@ -1,5 +1,5 @@
 import { Exam } from "@/types/Exam";
-import ExamTable from "./UserExamTable";
+import ExamTable from "../../../../components/UserExamTable";
 import apiServer from "@/utils/axiosServer";
 import Body from "./Body";
 

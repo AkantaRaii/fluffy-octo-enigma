@@ -334,7 +334,7 @@ class UserDashboardView(APIView):
         return Response(serializer.data)
 
 
-# ---------------- Admin Dashboard -----------------
+
 class AdminDashboardView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -343,32 +343,43 @@ class AdminDashboardView(APIView):
         if user.role != 'ADMIN':
             return Response({"detail": "Unauthorized"}, status=403)
 
+        # Exams and users
         total_exams = Exam.objects.count()
         active_exams = Exam.objects.filter(is_active=True).count()
         total_users = User.objects.count()
 
-        # Pending attempts
-        pending_attempts = UserExamAttempt.objects.filter(is_submitted=False).count()
+        # Pass rate calculation
+        submitted_attempts = UserExamAttempt.objects.filter(is_submitted=True)
+        stats = submitted_attempts.aggregate(
+            total_submitted=Count("id"),
+            passed_attempts=Count("id", filter=Q(status="passed")),
+        )
+        total_submitted = stats["total_submitted"] or 0
+        passed_attempts = stats["passed_attempts"] or 0
+        pass_rate = (passed_attempts / total_submitted * 100) if total_submitted > 0 else 0
 
-        # Recent 5 attempts
-        recent_attempts = UserExamAttempt.objects.filter(is_submitted=True).order_by('-submitted_at')[:5].values(
-            'user__email', 'exam__title', 'score', 'status', 'submitted_at'
+        # Recent attempts (5 latest submitted)
+        recent_attempts = list(
+            submitted_attempts.order_by("-submitted_at")
+            .values("user__email", "exam__title", "score", "status", "submitted_at")[:5]
         )
 
-        # Department-wise stats: total exams and active exams per department
-        department_stats = Department.objects.annotate(
-            total_exams=Count('exam'),
-            active_exams=Count('exam', filter=Q(exam__is_active=True))
-        ).values('name', 'total_exams', 'active_exams')
+        # Department stats
+        department_stats = list(
+            Department.objects.annotate(
+                total_exams=Count("exam"),
+                active_exams=Count("exam", filter=Q(exam__is_active=True)),
+            ).values("name", "total_exams", "active_exams")
+        )
 
+        # Prepare response
         data = {
             "total_exams": total_exams,
             "active_exams": active_exams,
             "total_users": total_users,
-            "pending_attempts": pending_attempts,
-            "recent_attempts": list(recent_attempts),
-            "department_stats": list(department_stats),
+            "pass_rate": round(pass_rate, 2),  # e.g. 76.45
+            "recent_attempts": recent_attempts,
+            "department_stats": department_stats,
         }
 
-        serializer = AdminDashboardSerializer(data)
-        return Response(serializer.data)
+        return Response(AdminDashboardSerializer(data).data)

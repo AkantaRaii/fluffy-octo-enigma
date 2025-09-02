@@ -4,7 +4,7 @@ type DashboardData = {
   total_exams: number;
   active_exams: number;
   total_users: number;
-  pending_attempts: number;
+  pass_rate: number;
   recent_attempts: {
     user__email: string;
     exam__title: string;
@@ -32,7 +32,11 @@ export default function Body({ data }: { data: DashboardData }) {
 
       {/* Top Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <StatCard title="Total Exams" value={data.total_exams} />
+        <StatCard
+          title="Total Exams"
+          value={data.total_exams}
+          href="/application/admin/exams"
+        />
         <StatCard
           title="Active Exams"
           value={data.active_exams}
@@ -43,7 +47,7 @@ export default function Body({ data }: { data: DashboardData }) {
           value={data.total_users}
           href="/application/admin/users"
         />
-        <StatCard title="Pending Attempts" value={data.pending_attempts} />
+        <StatCard title="Pass Rate" value={`${data.pass_rate}%`} />
       </div>
 
       {/* Recent Attempts */}
@@ -100,27 +104,48 @@ export default function Body({ data }: { data: DashboardData }) {
       </div>
 
       {/* Department Stats */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-md overflow-hidden">
         <h2 className="text-lg font-semibold px-6 py-4 border-b border-gray-200">
           Department Stats
         </h2>
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-100 text-gray-700">
-              <tr>
-                <th className="py-3 px-6 text-left font-medium">Department</th>
-                <th className="py-3 px-6 text-left font-medium">Total Exams</th>
-                <th className="py-3 px-6 text-left font-medium">
+          <table className="min-w-full text-sm border-collapse">
+            <thead>
+              <tr className="bg-gray-50 text-gray-700 uppercase text-xs tracking-wider">
+                <th className="py-3 px-6 text-left font-semibold">
+                  Department
+                </th>
+                <th className="py-3 px-6 text-left font-semibold">
+                  Total Exams
+                </th>
+                <th className="py-3 px-6 text-left font-semibold">
                   Active Exams
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody>
               {data.department_stats.map((d, i) => (
-                <tr key={i} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-3 px-6">{d.name}</td>
-                  <td className="py-3 px-6">{d.total_exams}</td>
-                  <td className="py-3 px-6">{d.active_exams}</td>
+                <tr
+                  key={i}
+                  className={`transition-colors ${
+                    i % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  } hover:bg-indigo-50`}
+                >
+                  <td className="py-4 px-6 font-medium text-gray-800">
+                    {d.name}
+                  </td>
+                  <td className="py-4 px-6 text-gray-600">{d.total_exams}</td>
+                  <td className="py-4 px-6">
+                    <span
+                      className={`px-3 py-1 text-xs font-medium rounded-full ${
+                        d.active_exams > 0
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-600"
+                      }`}
+                    >
+                      {d.active_exams}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>

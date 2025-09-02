@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import ExamTable from "./UserExamTable";
+import ExamTable from "../../../../components/UserExamTable";
 import { Exam } from "@/types/Exam";
 interface ExamTableProps {
   exams: Exam[];

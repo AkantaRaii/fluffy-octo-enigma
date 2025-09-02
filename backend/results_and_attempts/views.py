@@ -16,7 +16,7 @@ class UserExamAttemptViewSet(viewsets.ModelViewSet):
     queryset = UserExamAttempt.objects.all()
     serializer_class = UserExamAttemptCreateSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['exam']
+    filterset_fields = ['exam','user']
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
