@@ -7,7 +7,7 @@ export default async function AccountPage() {
   const user = res.data;
 
   return (
-    <div className="max-w-6xl mx-auto mt-10">
+    <div>
       <ProfileSection initialUser={user} />
     </div>
   );

@@ -59,9 +59,9 @@ export default function UserTable({ data, onEdit, onDelete }: TableProps) {
         <tbody className="text-sm text-gray-700">
           {users.map((user) => (
             <tr
-              onClick={() => {
-                router.push(`/application/admin/users/exams/${user.id}`);
-              }}
+              // onClick={() => {
+              //   router.push(`/application/admin/users/exams/${user.id}`);
+              // }}
               key={user.id}
               className="border-b border-gray-200 last:border-b-0 hover:cursor-pointer hover:bg-gray-100 transition"
             >

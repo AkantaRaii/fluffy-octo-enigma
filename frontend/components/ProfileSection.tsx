@@ -1,55 +1,137 @@
-// components/ProfileSection.tsx
 "use client";
 
+import { useState } from "react";
+import apiClient from "@/utils/axiosClient";
+import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-interface UserProfile {
+interface User {
+  id: number;
   first_name: string;
   last_name: string;
   email: string;
-  phone?: string;
+  phone: string;
+  department: string | null;
   role: string;
-  department?: { id: number; name: string } | null;
 }
 
-export default function ProfileSection({ user }: { user: UserProfile }) {
+export default function ProfileSection({ initialUser }: { initialUser: User }) {
+  const [user, setUser] = useState<User>(initialUser);
+  const [formData, setFormData] = useState<Partial<User>>(initialUser);
+  const [editField, setEditField] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
   const router = useRouter();
 
-  return (
-    <div className="max-w-lg mx-auto bg-white rounded-2xl shadow p-6 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-700">My Profile</h2>
+  const handleChange = (field: keyof User, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setIsDirty(true);
+  };
 
-      <div className="grid gap-4">
-        <ProfileRow label="Full Name" value={`${user.first_name} ${user.last_name}`} />
-        <ProfileRow label="Email" value={user.email} />
-        <ProfileRow label="Phone" value={user.phone || "—"} />
-        <ProfileRow label="Role" value={user.role} />
-        <ProfileRow label="Department" value={user.department?.name || "—"} />
-      </div>
+  const handleSave = async () => {
+    try {
+      const payload = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        phone: formData.phone,
+      };
+      const res = await apiClient.patch(
+        `/api/v1/auth/users/${user.id}/`,
+        payload
+      );
+      setUser(res.data);
+      setFormData(res.data);
+      setEditField(null);
+      setIsDirty(false);
+      toast.success("Account fields are updated.");
+    } catch (err) {
+      toast.error("Failed to update profile");
+    }
+  };
 
-      <div className="pt-4 border-t flex justify-between">
-        <button
-          onClick={() => router.push("/profile/edit")}
-          className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+  const handleChangePassword = async () => {
+    const res = await apiClient.post(
+      "api/v1/auth/users/forgot-password/request/",
+      { email: user.email }
+    );
+    if (res.status === 200) {
+      toast.success(res.data.message);
+      router.push(`/login/verify?email=${encodeURIComponent(user.email)}`);
+    }
+  };
+
+  const renderField = (
+    label: string,
+    field: keyof User,
+    type = "text",
+    readOnly = false
+  ) => (
+    <div className="mb-5 w-full">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+      {editField === field && !readOnly ? (
+        <input
+          type={type}
+          value={formData[field] || ""}
+          onChange={(e) => handleChange(field, e.target.value)}
+          onBlur={() => setEditField(null)}
+          autoFocus
+          className="w-full border border-gray-400 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      ) : (
+        <div
+          className={`w-full border border-gray-300 rounded-md p-2 cursor-pointer hover:border-gray-400 transition-colors ${
+            readOnly ? "bg-gray-100 cursor-not-allowed" : ""
+          }`}
+          onClick={() => !readOnly && setEditField(field)}
         >
-          Edit Profile
-        </button>
-        <button
-          onClick={() => router.push("/profile/change-password")}
-          className="px-4 py-2 rounded-lg bg-theme text-white hover:bg-theme-dark"
-        >
-          Change Password
-        </button>
-      </div>
+          {formData[field] || (
+            <span className="text-gray-400">Click to add</span>
+          )}
+        </div>
+      )}
     </div>
   );
-}
 
-function ProfileRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between">
-      <span className="text-gray-500">{label}</span>
-      <span className="font-medium">{value}</span>
-    </div>
+    <main className="flex-1">
+      <h1 className="text-2xl font-semibold mb-4">Profile</h1>
+
+      <section className="mb-10">
+        <div className="flex flex-row justify-between gap-2">
+          {renderField("First Name", "first_name")}
+          {renderField("Last Name", "last_name")}
+        </div>
+        <div className="flex flex-row justify-between gap-2">
+          {renderField("Email", "email", "email", true)}
+          {renderField("Phone", "phone")}
+        </div>
+        <div className="flex flex-row justify-between gap-2">
+          {renderField("Department", "department", "text", true)}
+          <button
+            title="change password"
+            onClick={handleChangePassword}
+            className="px-6 rounded-md h-10 text-white bg-theme hover:opacity-80 transition-colors self-center min-w-fit cursor-pointer"
+          >
+            Change Password
+          </button>
+        </div>
+      </section>
+
+      <div className="flex justify-end items-center mt-6">
+        <button
+          title="save changes"
+          onClick={handleSave}
+          disabled={!isDirty}
+          className={`px-10 py-2 rounded-md text-white font-medium ${
+            isDirty
+              ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              : "bg-gray-400 cursor-not-allowed"
+          }`}
+        >
+          Save Changes
+        </button>
+      </div>
+    </main>
   );
 }

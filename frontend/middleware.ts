@@ -20,11 +20,18 @@ export async function middleware(req: NextRequest) {
   const role = (token as any).role;
   const pathname = url.pathname;
 
-  if (pathname.startsWith("/application/admin") && !(role === "ADMIN" || role === "ANALYZER")) {
+  if (
+    pathname.startsWith("/application/admin") &&
+    !(role === "ADMIN" || role === "ANALYZER")
+  ) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  if (pathname.startsWith("/application/user") && !(role === "ADMIN" || role === "ANALYZER" || role === "USER")) {
+  if (
+    pathname.startsWith("/application/user") &&
+    !(role === "ADMIN" || role === "ANALYZER" || role === "USER")
+  ) {
+    // if (pathname.startsWith("/application/user") && !(role === "USER")) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 

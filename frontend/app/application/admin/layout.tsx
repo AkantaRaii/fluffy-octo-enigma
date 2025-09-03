@@ -9,6 +9,7 @@ import {
   ClipboardList,
   Send,
   Building,
+  UserIcon,
 } from "lucide-react";
 import { getServerSession } from "next-auth";
 export default async function AdminLayout({
@@ -37,6 +38,11 @@ export default async function AdminLayout({
       label: "Exams",
       href: "/application/admin/exams",
       icon: <ClipboardList size={18} />,
+    },
+    {
+      label: "Profile",
+      href: "/application/admin/profile",
+      icon: <UserIcon size={18} />,
     },
   ];
 

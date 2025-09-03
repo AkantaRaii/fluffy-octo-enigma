@@ -1,6 +1,5 @@
 // components/ExamReport.tsx
 "use client";
-
 import {
   Page,
   Text,
@@ -10,9 +9,21 @@ import {
   PDFDownloadLink,
   Image,
 } from "@react-pdf/renderer";
-import { Question } from "@/components/ResultQuestionCard";
 
 // ---------- Types ----------
+export interface Question {
+  id: string | number;
+  text: string;
+  marks: number;
+  is_correct: boolean;
+  options: {
+    id: string | number;
+    text: string;
+    is_selected: boolean;
+    is_correct: boolean;
+  }[];
+}
+
 export interface Attempt {
   user: { id: number; email: string; first_name: string; last_name: string };
   total_questions: number;
@@ -20,249 +31,252 @@ export interface Attempt {
   obtained_marks: number;
   total_marks: number;
   questions: Question[];
-  exam_title?: string; // <-- optional exam title
+  exam_title?: string;
 }
 
 // ---------- Styles ----------
 const styles = StyleSheet.create({
-  page: { padding: 40, fontSize: 12, fontFamily: "Helvetica" },
-
-  // Cover Page
-  cover: { flex: 1, justifyContent: "center", alignItems: "center" },
-  logo: { width: 120, height: 120, marginBottom: 20 },
-  heading: {
-    fontSize: 28,
-    marginBottom: 10,
-    color: "#91a92a",
-    fontWeight: "bold",
+  page: { padding: 30, fontSize: 11, fontFamily: "Helvetica" },
+  background: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
   },
-  subheading: { fontSize: 16, marginBottom: 6 },
-  footer: { position: "absolute", bottom: 30, fontSize: 10, color: "#666" },
-
-  // Sections
-  sectionHeading: {
-    fontSize: 20,
-    marginBottom: 10,
-    color: "#91a92a",
-    fontWeight: "bold",
-  },
-  section: { marginBottom: 20 },
-
-  // User Info Box
-  infoBox: {
+  coverHeader: {
+    alignItems: "center",
     marginBottom: 20,
-    padding: 12,
+    textAlign: "center",
+  },
+  logo: { width: 70, height: 70, marginBottom: 8 },
+  heading: { fontSize: 22, color: "#2c3e50", fontWeight: "bold" },
+  subheading: { fontSize: 13, marginBottom: 3, color: "#555" },
+  sectionHeading: {
+    fontSize: 16,
+    marginVertical: 8,
+    color: "#2c3e50",
+    fontWeight: "bold",
+  },
+  infoGrid: { flexDirection: "row", flexWrap: "wrap", marginBottom: 8 },
+  infoItem: { width: "50%", marginBottom: 4 },
+  infoLabel: { fontWeight: "bold", color: "#333" },
+  badge: {
+    padding: 4,
+    borderRadius: 3,
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 3,
+    width: 55,
+    fontSize: 10,
+  },
+  pass: { backgroundColor: "#91a92a" },
+  fail: { backgroundColor: "#e74c3c" },
+  barContainer: {
+    marginTop: 6,
+    height: 8,
+    width: "100%",
+    backgroundColor: "#eee",
+    borderRadius: 5,
+    overflow: "hidden",
+  },
+  barFill: { height: "100%", backgroundColor: "#91a92a" },
+  questionBlock: {
+    marginBottom: 10,
+    padding: 8,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#ddd",
     borderRadius: 6,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fafafa",
   },
-  infoRow: { flexDirection: "row", marginBottom: 6 },
-  infoLabel: { width: 100, fontWeight: "bold", fontSize: 12, color: "#333" },
-  infoValue: { fontSize: 12, color: "#555" },
-
-  // Table styles (flexbox)
-  table: { marginTop: 10, borderWidth: 1, borderColor: "#ccc" },
-  tableRow: { flexDirection: "row" },
-  tableColHeader: {
-    flex: 1,
-    borderRightWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    backgroundColor: "#f2f2f2",
-    padding: 4,
+  qText: { fontSize: 11, fontWeight: "bold", marginBottom: 4 },
+  option: {
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 6,
+    padding: 6,
+    marginBottom: 4,
   },
-  tableCol: {
-    flex: 1,
-    borderRightWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    padding: 4,
+  optionSelected: {
+    borderColor: "#84cc16",
+    backgroundColor: "#f7fee7",
   },
-  tableCellHeader: { fontSize: 12, fontWeight: "bold" },
-  tableCell: { fontSize: 11 },
-
-  correct: { color: "green" },
-  wrong: { color: "red" },
-  pass: { color: "#91a92a", fontWeight: "bold" },
-  fail: { color: "red", fontWeight: "bold" },
+  optionCorrect: {
+    borderColor: "green",
+    backgroundColor: "#ecfdf5",
+  },
+  optionText: { fontSize: 11, color: "#333" },
+  wrongText: { color: "red", fontWeight: "bold" },
+  correctText: { color: "green", fontWeight: "bold" },
+  footer: {
+    position: "absolute",
+    bottom: 15,
+    textAlign: "center",
+    width: "100%",
+    fontSize: 9,
+    color: "#777",
+  },
 });
 
 // ---------- Report Document ----------
-const ExamReport = ({ attempt }: { attempt: Attempt }) => {
-  const passMark = attempt.total_marks * 0.5; // 50% pass criteria
+const ExamReport = ({
+  attempt,
+  examTitle,
+}: {
+  attempt: Attempt;
+  examTitle: string;
+}) => {
+  const passMark = attempt.total_marks * 0.5;
   const isPass = attempt.obtained_marks >= passMark;
+  const percentage = Math.round(
+    (attempt.obtained_marks / attempt.total_marks) * 100
+  );
 
   return (
     <Document>
-      {/* Cover Page */}
-      <Page style={styles.page}>
-        <View style={styles.cover}>
-          <Image src="./gtnlogo.png" style={styles.logo} />
-          <Text style={styles.heading}>Exam Report</Text>
-          {attempt.exam_title && (
-            <Text style={styles.subheading}>Exam: {attempt.exam_title}</Text>
-          )}
+      {/* ---------- Cover Page ---------- */}
+      <Page
+        style={[
+          styles.page,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <View style={{ alignItems: "center" }}>
+          <Image src="/gtnlogo.png" style={styles.logo} />
+          <Text style={styles.heading}>{examTitle ?? "Exam Report"}</Text>
+
           <Text style={styles.subheading}>
             Candidate: {attempt.user.first_name} {attempt.user.last_name}
           </Text>
           <Text style={styles.subheading}>Email: {attempt.user.email}</Text>
-          <Text>Generated on {new Date().toLocaleDateString()}</Text>
+          <Text style={{ fontSize: 9, marginTop: 4 }}>
+            Generated on{" "}
+            {new Date().toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </Text>
         </View>
-        <Text style={styles.footer}>
-          Confidential — Generated by GTN Exam System
-        </Text>
       </Page>
 
-      {/* Summary Page */}
+      {/* ---------- Summary + Q&A Page ---------- */}
       <Page style={styles.page}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            marginBottom: 15,
+          }}
+        >
+          <Text style={styles.heading}>{examTitle ?? "Exam Report"}</Text>
+          <Image src="/gtnlogo.png" style={styles.logo} />
+        </View>
         <Text style={styles.sectionHeading}>Summary</Text>
-
-        {/* User Info */}
-        <View style={styles.infoBox}>
-          <View style={styles.infoRow}>
+        <View style={styles.infoGrid}>
+          <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Name:</Text>
-            <Text style={styles.infoValue}>
+            <Text>
               {attempt.user.first_name} {attempt.user.last_name}
             </Text>
           </View>
-          <View style={styles.infoRow}>
+          <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Email:</Text>
-            <Text style={styles.infoValue}>{attempt.user.email}</Text>
+            <Text>{attempt.user.email}</Text>
           </View>
-          <View style={styles.infoRow}>
+          <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Exam Date:</Text>
-            <Text style={styles.infoValue}>
-              {new Date().toLocaleDateString()}
+            <Text>
+              {new Date().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
             </Text>
           </View>
-          <View style={styles.infoRow}>
+          <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Status:</Text>
-            <Text
-              style={[styles.infoValue, isPass ? styles.pass : styles.fail]}
-            >
-              {isPass ? "Pass" : "Fail"}
+            <Text style={[styles.badge, isPass ? styles.pass : styles.fail]}>
+              {isPass ? "PASS" : "FAIL"}
             </Text>
           </View>
         </View>
 
-        {/* Scores Table */}
-        <View style={styles.table}>
-          <View style={styles.tableRow}>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Total Questions</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Correct Answers</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Obtained Marks</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Total Marks</Text>
-            </View>
-          </View>
-
-          <View style={styles.tableRow}>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{attempt.total_questions}</Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={[styles.tableCell, { color: "#91a92a" }]}>
-                {attempt.correct_answers}
-              </Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>
-                {attempt.obtained_marks} (
-                {Math.round(
-                  (attempt.obtained_marks / attempt.total_marks) * 100
-                )}
-                %)
-              </Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{attempt.total_marks}</Text>
-            </View>
-          </View>
+        <Text style={styles.infoLabel}>
+          Marks: {attempt.obtained_marks} / {attempt.total_marks} ({percentage}
+          %)
+        </Text>
+        <View style={styles.barContainer}>
+          <View style={[styles.barFill, { width: `${percentage}%` }]} />
         </View>
-      </Page>
 
-      {/* Questions Page */}
-      <Page style={styles.page}>
         <Text style={styles.sectionHeading}>Questions & Answers</Text>
-        <View style={styles.table}>
-          {/* Header */}
-          <View style={styles.tableRow}>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Q#</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Question</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Your Answer</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Correct Answer</Text>
-            </View>
-          </View>
-
-          {/* Rows */}
-          {attempt.questions.map((q, idx) => {
-            const userAnswer =
-              q.options
-                .filter((o) => o.is_selected)
-                .map((o) => o.text)
-                .join(", ") || "—";
-            const correctAnswer =
-              q.options
-                .filter((o) => o.is_correct)
-                .map((o) => o.text)
-                .join(", ") || "—";
-            const isCorrect = userAnswer === correctAnswer;
-
-            return (
-              <View style={styles.tableRow} key={q.id}>
-                <View style={styles.tableCol}>
-                  <Text style={styles.tableCell}>{idx + 1}</Text>
-                </View>
-                <View style={styles.tableCol}>
-                  <Text style={styles.tableCell}>{q.text}</Text>
-                </View>
-                <View style={styles.tableCol}>
+        {attempt.questions.map((q, idx) => (
+          <View
+            key={q.id}
+            style={[
+              styles.questionBlock,
+              ...(q.is_correct ? [] : [{ borderColor: "red" }]),
+            ]}
+          >
+            <Text style={styles.qText}>
+              Q{idx + 1}. {q.text} ({q.marks} marks)
+            </Text>
+            {q.options
+              .filter((o) => o.is_selected || o.is_correct)
+              .map((opt) => (
+                <View
+                  key={opt.id}
+                  style={[
+                    styles.option,
+                    ...(opt.is_selected ? [styles.optionSelected] : []),
+                    ...(opt.is_correct ? [styles.optionCorrect] : []),
+                  ]}
+                >
                   <Text
                     style={[
-                      styles.tableCell,
-                      isCorrect ? styles.correct : styles.wrong,
+                      styles.optionText,
+                      ...(opt.is_selected && !opt.is_correct
+                        ? [styles.wrongText]
+                        : []),
+                      ...(opt.is_correct ? [styles.correctText] : []),
                     ]}
                   >
-                    {userAnswer}
+                    {opt.text}
                   </Text>
                 </View>
-                <View style={styles.tableCol}>
-                  <Text style={[styles.tableCell, styles.correct]}>
-                    {correctAnswer}
-                  </Text>
-                </View>
-              </View>
-            );
-          })}
-        </View>
+              ))}
+          </View>
+        ))}
+
+        <Text style={styles.footer}>
+          Confidential — Generated by GTN Exam System
+        </Text>
       </Page>
     </Document>
   );
 };
 
 // ---------- Exported Download Button ----------
-export const DownloadReportButton = ({ attempt }: { attempt: Attempt }) => (
+export const DownloadReportButton = ({
+  attempt,
+  examTitle,
+}: {
+  attempt: Attempt;
+  examTitle: string;
+}) => (
   <PDFDownloadLink
-    document={<ExamReport attempt={attempt} />}
-    fileName={`exam-report-${attempt.user.first_name}-${
+    document={<ExamReport attempt={attempt} examTitle={examTitle} />}
+    fileName={`exam-report-${examTitle ?? "report"}-${
       new Date().toISOString().split("T")[0]
     }.pdf`}
   >
-    {({ loading }) => (
+    {({ loading }: { loading: boolean }) => (
       <button
         className="px-4 py-2 bg-theme text-white rounded-lg shadow hover:bg-theme-dark"
         disabled={loading}

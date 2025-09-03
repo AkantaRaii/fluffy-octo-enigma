@@ -32,7 +32,7 @@ export default function Body({ attempt, exam }: Props) {
       {/* Download Button */}
       <div className="flex justify-between mb-4">
         <h1 className="text-2xl font-bold">{exam?.title}</h1>
-        <DownloadReportButton attempt={attempt} />
+        <DownloadReportButton attempt={attempt} examTitle={exam?.title ?? ""} />
       </div>
 
       {/* On-screen Report Preview (same as before) */}
