@@ -18,10 +18,8 @@ from .permissions import *
 
 class Me(APIView):
     permission_classes = [IsAuthenticated]
-
     def get(self, request):
         user = request.user
-        user = User.objects.get(id=user.id)
         response = {
             "id": user.id,
             "email": user.email,
@@ -31,13 +29,10 @@ class Me(APIView):
             "department":user.department.name}
         return Response(response, status=200)
 
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 # users/views.py
-
-
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(otp_verified=True)
     serializer_class = UserSerializer
@@ -45,11 +40,13 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ['first_name', 'last_name', 'email']
     ordering_fields = ['id', 'first_name', 'last_name', 'email', 'role']
     filterset_fields = ['department']
-
+    permission_classes=[IsAdminOrSelf]
     def get_permissions(self):
-        if self.action == 'create':  # register
+        if self.action == 'create':
             return [AllowAny()]
-        if self.action in ['update', 'partial_update', 'destroy']:
+        elif self.action in ['list']:
+            return [IsAdmin()]  
+        elif self.action in ['update', 'partial_update', 'destroy']:
             return [IsAuthenticated(), IsAdminOrSelf()]
         return [IsAuthenticated()]
 
@@ -249,3 +246,16 @@ class ForgotPasswordConfirmView(APIView):
 
         return Response({"message": "Password reset successfully"}, status=200)
 
+class CheckEmailView(APIView):
+
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get("email", "").strip()
+        if not email:
+            return Response(
+                {"message": "Email is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        exists = User.objects.filter(email__iexact=email).exists()
+        return Response({"exists": exists}, status=status.HTTP_200_OK)

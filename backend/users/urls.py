@@ -14,5 +14,6 @@ urlpatterns = [
     path('users/forgot-password/request/', ForgotPasswordRequestView.as_view(), name='forgot-password-request'),
     path('users/forgot-password/verify-otp/', VerifyOTPForgotPasswordView.as_view(), name='forgot-password-verify-otp'),
     path('users/forgot-password/confirm/', ForgotPasswordConfirmView.as_view(), name='forgot-password-confirm'),
+    path('check-email/', CheckEmailView.as_view(), name='check-email'),
     path('', include(router.urls)),
 ]

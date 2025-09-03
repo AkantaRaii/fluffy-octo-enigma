@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { Department } from "@/types/Depertment";
 import apiClient from "@/utils/axiosClient";
-import { s } from "framer-motion/client";
-import { sub } from "date-fns";
+import { AlertTriangle } from "lucide-react";
 
 // TailwindCSS required. Framer Motion: `npm i framer-motion`
 // Ensure <ToastContainer /> is mounted in your root layout for react-toastify.
@@ -15,6 +14,7 @@ interface Props {
 }
 export default function RegisterForm({ departments }: Props) {
   const router = useRouter();
+  const [emailRegistered, setEmailRegistered] = useState(false);
 
   const steps = [
     { id: 1, title: "Basic Info" },
@@ -74,12 +74,40 @@ export default function RegisterForm({ departments }: Props) {
     exit: (d: 1 | -1) => ({ x: d > 0 ? -40 : 40, opacity: 0 }),
   };
 
-  const next = () => {
+  const next = async () => {
+    if (step === 1) {
+      if (!step1Valid) return;
+
+      try {
+        setSubmitting(true);
+        // Call your API to check if email exists
+        const res = await apiClient.post("/api/v1/auth/check-email/", {
+          email: form.email,
+        });
+        const response = res.data;
+        if (response.exists) {
+          toast.error("Email is already registered.");
+          setSubmitting(false);
+          setEmailRegistered(true);
+          return; // Don't go to next step
+        }
+        console.log("check email");
+      } catch (err: any) {
+        toast.error(err.response?.data?.message || "Error checking email.");
+        setSubmitting(false);
+        return;
+      } finally {
+        setSubmitting(false);
+      }
+    }
+
+    // Move to next step if all good
     if (step < steps.length) {
       setDirection(1);
       setStep((s) => s + 1);
     }
   };
+
   const back = () => {
     if (step > 1) {
       setDirection(-1);
@@ -177,17 +205,28 @@ export default function RegisterForm({ departments }: Props) {
                       type="email"
                       className="mt-1 w-full rounded-lg border border-gray-300 px-3 h-10 focus:outline-none focus:ring-2 focus:ring-theme"
                       value={form.email}
-                      onChange={(e) =>
-                        setForm({ ...form, email: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setForm({ ...form, email: e.target.value });
+                        setEmailRegistered(false);
+                      }}
                       placeholder="you@example.com"
                       required
                     />
-                    {!emailValid && form.email.length > 0 && (
-                      <p className="text-xs text-red-600 mt-1">
-                        Please enter a valid email.
-                      </p>
-                    )}
+                    {/* Validation messages */}
+                    <div className="mt-1 space-y-1">
+                      {!emailValid && form.email.length > 0 && (
+                        <div className="flex items-center text-red-600 text-xs font-medium bg-red-50 border border-red-200 rounded px-2 py-1">
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          Please enter a valid email
+                        </div>
+                      )}
+                      {emailRegistered && (
+                        <div className="flex items-center text-red-600 text-xs font-medium bg-red-50 border border-red-200 rounded px-2 py-1">
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          Email already registered
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div>
