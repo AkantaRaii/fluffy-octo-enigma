@@ -36,7 +36,7 @@ export default async function page({ params }: Props) {
 
   //jsx
   return (
-    <div className=" max-w-7xl ">
+    <div className=" max-w-7xl py-2 ">
       {/* Exam Info Card */}
       <div className=" mb-4">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">

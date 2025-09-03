@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Users, FileText, Plus, Trash, SquarePen } from "lucide-react";
+import { Plus, Trash, SquarePen } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Department } from "@/types/Depertment";
 import DepartmentModal from "./DepartmentModal";
@@ -36,8 +36,8 @@ export default function DepartmentTable({ data }: TableProps) {
 
   return (
     <div>
-      <div className="flex justify-between mb-2">
-        <h1 className="py-2 font-semibold text-xl">Departments</h1>
+      <div className="flex justify-between mb-4">
+        <h1 className="text-2xl font-bold text-gray-900 ">Departments</h1>
         <button
           title="Add Department"
           onClick={() => {

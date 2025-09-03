@@ -45,7 +45,9 @@ export default function Body({ attempt }: Props) {
             </h1>
             <h1 className="text-md font-bold mb-2 text-center">
               Email:{" "}
-              <span className="font-semibold text-gray-600">{attempt.user.email}</span>
+              <span className="font-semibold text-gray-600">
+                {attempt.user.email}
+              </span>
             </h1>
           </div>
 
@@ -53,19 +55,27 @@ export default function Body({ attempt }: Props) {
             <h2 className="text-xl font-semibold mb-4">Exam Result</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div className="flex flex-col justify-center items-center">
-                <span className="font-semibold text-3xl">{attempt.total_questions}</span>
+                <span className="font-semibold text-3xl">
+                  {attempt.total_questions}
+                </span>
                 <p className="text-gray-400">Total Questions</p>
               </div>
               <div className="flex flex-col justify-center items-center">
-                <span className="font-semibold text-theme text-3xl">{attempt.correct_answers}</span>
-                <p className="text-gray-400">Correct Answers</p>
+                <span className="font-semibold text-theme text-3xl">
+                  {attempt.correct_answers}
+                </span>
+                <p className="text-gray-400">Correct</p>
               </div>
               <div className="flex flex-col justify-center items-center">
-                <span className="font-semibold text-3xl">{attempt.total_marks}</span>
+                <span className="font-semibold text-3xl">
+                  {attempt.total_marks}
+                </span>
                 <p className="text-gray-400">Total Marks</p>
               </div>
               <div className="flex flex-col justify-center items-center">
-                <span className="font-semibold text-3xl">{attempt.obtained_marks}</span>
+                <span className="font-semibold text-3xl">
+                  {attempt.obtained_marks}
+                </span>
                 <p className="text-gray-400">Marks Obtained</p>
               </div>
             </div>
@@ -75,7 +85,9 @@ export default function Body({ attempt }: Props) {
         {/* Questions */}
         <div className="space-y-4">
           {attempt.questions.length > 0 ? (
-            attempt.questions.map((q, idx) => <ResultQuestionCard key={q.id} q={q} idx={idx} />)
+            attempt.questions.map((q, idx) => (
+              <ResultQuestionCard key={q.id} q={q} idx={idx} />
+            ))
           ) : (
             <p className="text-sm text-gray-500">No questions available</p>
           )}

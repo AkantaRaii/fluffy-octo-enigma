@@ -9,7 +9,7 @@ export default function Body({ users }: Props) {
   const [deptUsers, setDeptUsers] = useState<User[]>(users);
   const onDelete = () => {};
   return (
-    <div className="py-4">
+    <div>
       <UserTable data={deptUsers} onEdit={() => {}} onDelete={() => {}} />
     </div>
   );

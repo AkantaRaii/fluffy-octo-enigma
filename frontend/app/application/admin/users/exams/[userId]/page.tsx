@@ -13,8 +13,8 @@ export default async function ExamAttempts({
 
   // Pass plain JSON to client component
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-semibold mb-4">Exam Attempts</h1>
+    <div className="py-2">
+      <h1 className="text-xl font-semibold mb-4">{attempts[0].user.first_name} {attempts[0].user.last_name}</h1>
       <AttemptTable data={attempts} />
     </div>
   );

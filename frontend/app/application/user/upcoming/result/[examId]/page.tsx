@@ -12,9 +12,11 @@ export default async function page({ params }: Props) {
     `api/v1/examsession/results/?exam=${examId}`
   );
   const attempResult = await resultRes.data;
+  const examRes = await apiServer(`api/v1/exams/exams/${examId}/`);
+  const exam = examRes.data;
   return (
     <div>
-      <Body attempt={attempResult[0]} />
+      <Body attempt={attempResult[0]} exam={exam} />
     </div>
   );
 }

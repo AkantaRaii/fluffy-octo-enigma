@@ -26,8 +26,8 @@ export default function ResultQuestionCard({ q, idx }: Props) {
   return (
     <article
       className={`rounded-2xl border ${
-        q.is_correct ? "" : "border-red-700 border-dashed bg-red-50"
-      } border-gray-200  shadow-md transition w-full`}
+        q.is_correct ? "" : "border-red-800 border-dashed bg-red-200"
+      } border-gray-200 shadow-md transition w-full`}
     >
       <div className="p-5 select-none">
         {/* Header */}
@@ -44,56 +44,37 @@ export default function ResultQuestionCard({ q, idx }: Props) {
         </div>
 
         {/* Options */}
-        {/* Options */}
         <ul className="mt-3 space-y-2">
           {q.options
-            .filter((opt) => opt.is_selected || opt.is_correct) // only guessed or correct
-            .map((opt) => {
-              const checked = opt.is_selected;
-
-              return (
-                <li key={opt.id}>
-                  <label
-                    className={`flex items-start gap-3 rounded-xl border px-3 py-2 cursor-pointer transition
-              ${
-                checked
-                  ? "border-lime-500 bg-lime-50"
-                  : "border-gray-200 bg-white "
-              }
-            `}
+            .filter((opt) => opt.is_selected || opt.is_correct)
+            .map((opt) => (
+              <li key={opt.id}>
+                <div
+                  className={`flex items-start gap-3 rounded-xl border px-3 py-2 transition
+                    ${
+                      opt.is_selected
+                        ? "border-lime-500 bg-lime-50"
+                        : "border-gray-200 bg-white"
+                    }
+                  `}
+                >
+                  <span
+                    className={`leading-relaxed text-sm md:text-[15px] ${
+                      opt.is_selected
+                        ? "font-medium text-lime-700"
+                        : "text-gray-700"
+                    }`}
                   >
-                    {q.type === "MCQ_SINGLE" ? (
-                      <input
-                        type="radio"
-                        name={`q-${q.id}`}
-                        className="mt-1 text-lime-600 focus:ring-lime-500"
-                        checked={checked}
-                        readOnly
-                      />
-                    ) : (
-                      <input
-                        type="checkbox"
-                        className="mt-1 text-lime-600 focus:ring-lime-500"
-                        checked={checked}
-                        readOnly
-                      />
+                    {opt.text}
+                    {opt.is_correct && (
+                      <span className="ml-2 text-xs text-green-600">
+                        (Correct)
+                      </span>
                     )}
-                    <span
-                      className={`leading-relaxed text-sm md:text-[15px] ${
-                        checked ? "font-medium text-lime-700" : "text-gray-700"
-                      }`}
-                    >
-                      {opt.text}
-                      {opt.is_correct && (
-                        <span className="ml-2 text-xs text-green-600">
-                          (Correct)
-                        </span>
-                      )}
-                    </span>
-                  </label>
-                </li>
-              );
-            })}
+                  </span>
+                </div>
+              </li>
+            ))}
         </ul>
       </div>
     </article>

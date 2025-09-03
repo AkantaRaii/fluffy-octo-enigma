@@ -39,17 +39,16 @@ export default function AttemptTable({ data }: TableProps) {
       <table className="min-w-full border-collapse">
         <thead>
           <tr className="bg-gray-200 text-left text-sm font-medium text-gray-700">
-            <th className="py-3 px-4 text-center">Exam Title</th>
-            <th className="py-3 px-4 text-center">User</th>
-            <th className="py-3 px-4 text-center">Score</th>
-            <th className="py-3 px-4 text-center">Passing Score</th>
-            <th className="py-3 px-4 text-center">Status</th>
+            <th className="py-3 px-4 text-start">Exam Title</th>
+            <th className="py-3 px-4 text-start">Score</th>
+            <th className="py-3 px-4 text-start">Passing Score</th>
+            <th className="py-3 px-4 text-start">Status</th>
           </tr>
         </thead>
         <tbody className="text-sm">
           {data.length === 0 ? (
             <tr>
-              <td colSpan={6} className="py-6 text-center text-gray-500">
+              <td colSpan={6} className="py-6 text-start text-gray-500">
                 No attempts found.
               </td>
             </tr>
@@ -60,28 +59,21 @@ export default function AttemptTable({ data }: TableProps) {
                   router.push;
                 }}
                 key={row.id}
-                className="border-b border-gray-300 last:border-b-0 hover:bg-gray-100 transition hover:cursor-pointer"
+                className="border-b border-gray-300 last:border-b-0 hover:bg-gray-100 transition "
               >
                 <td
-                  className="py-3 px-4 text-blue-600 hover:underline cursor-pointer text-center"
+                  className="py-3 px-4 cursor-pointer text-start"
                   onClick={() =>
                     router.push(`/application/admin/attempts/${row.id}`)
                   }
                 >
                   {row.exam.title}
                 </td>
-                <td className="py-3 px-4 text-center">
-                  {row.user.first_name} {row.user.last_name}
-                  <br />
-                  <span className="text-xs text-gray-500">
-                    {row.user.email}
-                  </span>
-                </td>
-                <td className="py-3 px-4 text-center">{row.score}</td>
-                <td className="py-3 px-4 text-center">
+                <td className="py-3 px-4 text-start">{row.score}</td>
+                <td className="py-3 px-4 text-start">
                   {row.exam.passing_score}
                 </td>
-                <td className="py-3 px-4 text-center">
+                <td className="py-3 px-4 text-start">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
                       row.status === "passed"

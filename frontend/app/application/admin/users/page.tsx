@@ -2,7 +2,6 @@ import apiServer from "@/utils/axiosServer";
 import { User } from "@/types/User";
 import { Department } from "@/types/Depertment";
 import Body from "./components/Body";
-import { ChartNoAxesColumnDecreasing } from "lucide-react";
 interface Props {
   params: {
     deptId: string;

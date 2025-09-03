@@ -22,10 +22,9 @@ export default async function Page({ params }: Props) {
     console.error("server failed");
   }
   return (
-    <div className="max-w-7xl">
-      <h1 className="text-2xl font-bold text-gray-800 ">
-        Department:{" "}
-        <span className="text-theme">{department?.name}</span>
+    <div className="max-w-7xl py-2 ">
+      <h1 className="text-2xl font-bold text-gray-900">
+        Department: <span className="text-theme">{department?.name}</span>
       </h1>
       <Body users={users} />
     </div>

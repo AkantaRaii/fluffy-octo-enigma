@@ -21,7 +21,7 @@ type DashboardData = {
 
 export default function Body({ data }: { data: DashboardData }) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 py-2">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
@@ -104,7 +104,7 @@ export default function Body({ data }: { data: DashboardData }) {
       </div>
 
       {/* Department Stats */}
-      <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <h2 className="text-lg font-semibold px-6 py-4 border-b border-gray-200">
           Department Stats
         </h2>

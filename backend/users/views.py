@@ -12,7 +12,8 @@ from .tasks import send_otp_via_email
 from django.utils import timezone
 from datetime import  timedelta
 import jwt
-
+from exams.models import Department
+from .permissions import *
 # Create your views here.
 
 class Me(APIView):
@@ -27,7 +28,7 @@ class Me(APIView):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "role": user.role,
-        }
+            "department":user.department.name}
         return Response(response, status=200)
 
 
@@ -38,7 +39,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.filter(otp_verified=True)
     serializer_class = UserSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['first_name', 'last_name', 'email']
@@ -48,23 +49,29 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == 'create':  # register
             return [AllowAny()]
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [IsAuthenticated(), IsAdminOrSelf()]
         return [IsAuthenticated()]
 
+    def get_serializer_class(self):
+        """Restrict non-admin users to limited fields on update"""
+        if self.action in ['update', 'partial_update']:
+            user = self.request.user
+            if not (user.is_staff or user.role == "admin"):
+                return UserRestrictedSerializer
+        return super().get_serializer_class()
+
     def perform_create(self, serializer):
-        """Called after serializer.is_valid() but before returning response."""
         user = serializer.save()
-        # send OTP in background
         send_otp_via_email.delay(user.email)
 
     def create(self, request, *args, **kwargs):
-        """Override create to customize response if needed"""
         response = super().create(request, *args, **kwargs)
         return Response({
             "message": "Registration successful, OTP sent to email",
             "data": response.data
         }, status=status.HTTP_201_CREATED)
-    def get_queryset(self):
-        return User.objects.filter(otp_verified=True)
+
 
 class VerifyOTPView(APIView):
     permission_classes = [AllowAny]
@@ -132,7 +139,7 @@ class VerifyOTPForgotPasswordView(APIView):
         if user.otp != otp:
             return Response({"error": "Invalid OTP"}, status=400)
 
-        # ✅ Issue temporary JWT token (5 minutes)
+  
         temp_token = jwt.encode(
             {
                 "email": email,

@@ -58,3 +58,9 @@ class ResetPasswordRequestSerializer(serializers.Serializer):
 class ResetPasswordConfirmSerializer(serializers.Serializer):
     token = serializers.CharField()  # short-lived reset token
     new_password = serializers.CharField(write_only=True, min_length=8)
+
+
+class UserRestrictedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name"] 

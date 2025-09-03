@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Sidebar, { MenuItem } from "@/components/Sidebar";
 import SessionWrapper from "./SessionWrapper";
-import ProfileSection from "./ProfileSection";
+import ProfileSection from "./SignOutSection";
 import { Session } from "next-auth";
 interface LayoutProps {
   children: React.ReactNode;

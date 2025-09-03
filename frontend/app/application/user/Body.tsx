@@ -1,7 +1,6 @@
 "use client";
 
 import StatCard from "@/components/StatCard";
-import CustomTooltip from "@/components/CustomTooltip";
 import {
   PieChart,
   Pie,
