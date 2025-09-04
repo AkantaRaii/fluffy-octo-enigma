@@ -11,6 +11,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework import viewsets
+from .permissions import *
+from users.permissions import *
 
 class UserExamAttemptViewSet(viewsets.ModelViewSet):
     queryset = UserExamAttempt.objects.all()
@@ -114,7 +116,7 @@ class UserExamAttemptViewSet(viewsets.ModelViewSet):
 class UserResponseViewSet(viewsets.ModelViewSet):
     queryset = UserResponse.objects.all()
     serializer_class = UserResponseSerializer
-
+    permission_classes = [IsAuthenticated, CanEditOwnResponseUntilSubmitted]
     def get_queryset(self):
         return UserResponse.objects.filter(attempt__user=self.request.user)
 
@@ -130,7 +132,7 @@ class ExamResultViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['exam','user']
-
+    permission_classes=[IsAdminOrAnalyzerOrReadOnly]
     def get_queryset(self):
         user = self.request.user
         if user.role in ["ADMIN", "ANALYZER"]:

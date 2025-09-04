@@ -18,17 +18,21 @@ from .services import (
 )
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count, Avg, Sum,Q  # add others if needed
-
+from users.permissions import * 
+from .permissions import *
 # Create your views here.
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset=Department.objects.all()
+    permission_classes=[IsAdminOrAnalyzerOrReadOnly]
     serializer_class=DepartmentSerializers
     # permission_classes=[permissions.IsAuthenticated]
+    
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset=Question.objects.all()
     serializer_class=QuestionSerializers
     # permission_classes-[]
+    permission_classes=[IsAdmin]
     filter_backends=[filters.SearchFilter,filters.OrderingFilter]
     search_fields=['text']
     ordering_fields=['marks','created_at']
@@ -36,12 +40,15 @@ class QuestionViewSet(viewsets.ModelViewSet):
 class OptionViewSet(viewsets.ModelViewSet):
     queryset=Option.objects.all()
     serializer_class=OptionSerializers
+    permission_classes=[IsAdmin]
+
 class ExamViewSet(viewsets.ModelViewSet):
     queryset=Exam.objects.all()
     serializer_class=ExamSerializers
     filter_backends=[filters.SearchFilter,filters.OrderingFilter,DjangoFilterBackend]
     search_fields=['title','instructions']
     ordering_fields=['scheduled_start','duration_minutes']
+    permission_classes=[ExamPermission]
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
 
@@ -136,6 +143,7 @@ class ExamQuestionviewSet(viewsets.ModelViewSet):
     serializer_class=ExamQuestionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['exam']
+    permission_classes=[IsAdminOrAnalyzerOrReadOnly]
     @action(detail=False, methods=["post"], url_path="bulk_create")
     def bulk_create(self, request):
         """
@@ -182,6 +190,7 @@ class ExamInvitationViewSet(viewsets.ModelViewSet):
     serializer_class = ExamInvitationSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['exam','user']
+    permission_classes=[IsAdminOrAnalyzerOrReadOnly]
 
     def perform_create(self, serializer):
         # Auto-generate token using UUID and set added_by
@@ -246,6 +255,7 @@ class ExamInvitationViewSet(viewsets.ModelViewSet):
 
 
 class ExamStartAPIView(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request, token):
         #  Validate token & invitation
         try:
@@ -294,7 +304,7 @@ class ExamStartAPIView(APIView):
 
 # ---------------- User Dashboard -----------------
 class UserDashboardView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUser]
 
     def get(self, request):
         user = request.user
@@ -336,7 +346,7 @@ class UserDashboardView(APIView):
 
 
 class AdminDashboardView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdmin]
 
     def get(self, request):
         user = request.user
@@ -381,5 +391,4 @@ class AdminDashboardView(APIView):
             "recent_attempts": recent_attempts,
             "department_stats": department_stats,
         }
-
         return Response(AdminDashboardSerializer(data).data)

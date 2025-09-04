@@ -4,7 +4,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getServerSession } from "next-auth/next";
 import { jwtDecode } from "jwt-decode";
-async function refreshToken(token: any) {
+async function refreshToken(token: string) {
   if (token && token.refreshToken) {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/token/refresh/`,
@@ -60,7 +60,7 @@ export const authOptions = {
             return null; // Return null if no data is received
           }
           console.log(res);
-        } catch (err: any) {
+        } catch (err: unknown) {
           if (axios.isAxiosError(err)) {
             console.log(err.response);
             const backendMessage = err.response?.data?.detail || "Login failed";
