@@ -10,7 +10,7 @@ export default function Body({ users }: Props) {
   const onDelete = () => {};
   return (
     <div className="py-4">
-      <UserTable data={deptUsers} onEdit={() => {}} onDelete={() => {}} />
+      <UserTable data={deptUsers} />
     </div>
   );
 }

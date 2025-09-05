@@ -131,7 +131,6 @@ export default function Body({ data }: { data: DashboardData }) {
                   ))}
                 </Pie>
                 <Tooltip />
-                {/* <Tooltip content={<CustomTooltip />} /> */}
                 <Legend verticalAlign="bottom" height={36} />
               </PieChart>
             </ResponsiveContainer>

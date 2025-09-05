@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff } from "lucide-react";
 import apiClient from "@/utils/axiosClient";
-
+import { AxiosError } from "axios";
 export default function InputField() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -62,10 +62,9 @@ export default function InputField() {
         toast.success(res.data.message); // optional
         router.push(`/login/verify?email=${encodeURIComponent(email)}`);
       }
-    } catch (err: any) {
-      // handle 400 or other errors
-      const message = err.response?.data?.error || "Something went wrong";
-      toast.error(message);
+    } catch (error) {
+      console.error(error);
+      toast.error("Login failed. Please try again.");
     }
   };
 
@@ -157,7 +156,7 @@ export default function InputField() {
 
           {/* Register */}
           <div className="text-center">
-            Don't have an account yet?{" "}
+            Don&apos;t have an account yet?{" "}
             <Link href="/register">
               <span className="text-theme underline">Sign up</span>
             </Link>
@@ -170,7 +169,7 @@ export default function InputField() {
             Reset Password
           </h1>
           <p className="text-secondaryText text-sm mb-4 text-center">
-            Enter the email linked to your account. We’ll help you reset your
+            Enter the email linked to your account. We will help you reset your
             password.
           </p>
 

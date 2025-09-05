@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { auth } from "@/app/api/auth/[...nextauth]/route";
-
+import { auth } from "@/lib/auth";
 export const fetchServer = async <T = any>(
   url: string,
   options: AxiosRequestConfig = {}

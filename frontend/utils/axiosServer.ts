@@ -1,6 +1,5 @@
 import axios from "axios";
-import { auth } from "@/app/api/auth/[...nextauth]/route";
-
+import { auth } from "@/lib/auth";
 const apiServer = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   headers: { "Content-Type": "application/json" },

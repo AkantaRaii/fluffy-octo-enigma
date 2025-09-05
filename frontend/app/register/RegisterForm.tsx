@@ -92,8 +92,8 @@ export default function RegisterForm({ departments }: Props) {
           return; // Don't go to next step
         }
         console.log("check email");
-      } catch (err: any) {
-        toast.error(err.response?.data?.message || "Error checking email.");
+      } catch {
+        toast.error("Error checking email.");
         setSubmitting(false);
         return;
       } finally {

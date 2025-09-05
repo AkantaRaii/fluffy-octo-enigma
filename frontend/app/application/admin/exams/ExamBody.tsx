@@ -1,7 +1,7 @@
 "use client";
 import { Exam } from "@/types/Exam";
 import Table from "./components/table";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { Department } from "@/types/Depertment";
 import AddExam from "./components/AddExam";

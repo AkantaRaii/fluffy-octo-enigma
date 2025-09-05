@@ -2,13 +2,14 @@
 import apiServer from "@/utils/axiosServer";
 import ExamDashboard from "./components/ExamDashboard";
 import { redirect } from "next/navigation";
+import { AxiosError } from "axios";
 
 export default async function TokenPage({
   params,
 }: {
-  params: { examId: string; token: string };
+  params: Promise<{ examId: string; token: string }>;
 }) {
-  const { examId, token } = params;
+  const { examId, token } = await params;
   try {
     // Fetch exam session
     const examSessionRes = await apiServer.get(`api/v1/exams/start/${token}/`);
@@ -25,23 +26,19 @@ export default async function TokenPage({
       redirect(`/application/user/upcoming/result/${examId}`);
     }
     return <ExamDashboard exam={ExamSessionData} examId={examId} />;
-  } catch (error: any) {
-    console.error(
-      "Error in TokenPage:",
-      error?.response?.data || error.message
-    );
-    // Example: if token invalid → redirect to not found
-    if (error?.response?.status === 400) {
+  } catch (error) {
+    const err = error as AxiosError;
+    console.error("Error in TokenPage:", err.response?.data || err.message);
+
+    if (err.response?.status === 400) {
       redirect(`/application/user/upcoming/result/${examId}`);
     }
-    if (error?.response?.status === 404) {
+    if (err.response?.status === 404) {
       redirect("/not-found");
     }
-    // Example: if unauthorized
-    if (error?.response?.status === 401) {
+    if (err.response?.status === 401) {
       redirect("/login");
     }
-    // Fallback: show generic error page
     redirect("/error");
   }
 }

@@ -8,13 +8,29 @@ export interface NewOption {
   is_correct: boolean; // always boolean in form state
 }
 
+export interface QuestionPayload {
+  departments: number[];
+  text: string;
+  marks: number;
+  type: "MCQ_SINGLE" | "MCQ_MULTI";
+  options: {
+    text: string;
+    is_correct: boolean | number; // matches your backend shape
+  }[];
+}
+interface InitialQuestionData {
+  text?: string;
+  marks?: number;
+  departments?: number[];
+  type?: "MCQ_SINGLE" | "MCQ_MULTI";
+  options?: Option[];
+}
 interface QuestionFormProps {
-  initialData?: any;
+  initialData?: InitialQuestionData;
   departments: Department[];
-  onSubmit: (payload: any) => Promise<void>;
+  onSubmit: (payload: QuestionPayload) => Promise<void>;
   onCancel: () => void;
 }
-
 export default function QuestionForm({
   initialData = {},
   departments,
@@ -128,8 +144,9 @@ export default function QuestionForm({
         </label>
         <select
           value={type}
-          onChange={(e) => setType(e.target.value)}
-          className="mt-1 w-full border border-gray-300 rounded-lg p-2 bg-white"
+          onChange={(e) =>
+            setType(e.target.value as "MCQ_SINGLE" | "MCQ_MULTI")
+          }
         >
           <option value="MCQ_SINGLE">MCQ - Single Answer</option>
           <option value="MCQ_MULTI">MCQ - Multiple Answers</option>

@@ -1,7 +1,7 @@
 import { fetchServer } from "@/utils/fetchServer";
 import { Department } from "@/types/Depertment";
 import Table from "./components/table";
-export default async function () {
+export default async function Page() {
   let departments: Department[] = [];
   try {
     const res = await fetchServer(

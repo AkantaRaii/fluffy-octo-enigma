@@ -2,15 +2,12 @@ import apiServer from "@/utils/axiosServer";
 import { User } from "@/types/User";
 import { Department } from "@/types/Depertment";
 import Body from "./components.tsx/Body";
-import { ChartNoAxesColumnDecreasing } from "lucide-react";
 interface Props {
-  params: {
-    deptId: string;
-  };
+  params: Promise<{ deptId: string }>; 
 }
 
 export default async function Page({ params }: Props) {
-  const deptId = params.deptId;
+  const { deptId } = await params;
   let users: User[] = [];
   let department: Department | null = null;
   try {
@@ -19,7 +16,7 @@ export default async function Page({ params }: Props) {
     const deptResponse = await apiServer(`api/v1/exams/departments/${deptId}/`);
     department = deptResponse.data;
   } catch (error) {
-    console.error("server failed");
+    console.error("server failed", error);
   }
   return (
     <div className="max-w-7xl py-2 ">

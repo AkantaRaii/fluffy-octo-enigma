@@ -14,6 +14,7 @@ from datetime import  timedelta
 import jwt
 from exams.models import Department
 from .permissions import *
+# from .throttles import IPBasedThrottle
 # Create your views here.
 
 class Me(APIView):
@@ -26,11 +27,13 @@ class Me(APIView):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "role": user.role,
-            "department":user.department.name}
+            "department": user.department.name if user.department else None}
         return Response(response, status=200)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    # throttle_classes = [IPBasedThrottle]
+    # throttle_scope = "login"
 
 # users/views.py
 class UserViewSet(viewsets.ModelViewSet):
@@ -40,21 +43,21 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ['first_name', 'last_name', 'email']
     ordering_fields = ['id', 'first_name', 'last_name', 'email', 'role']
     filterset_fields = ['department']
-    permission_classes=[IsAdminOrSelf]
+    permission_classes=[IsAdmin]
     def get_permissions(self):
         if self.action == 'create':
             return [AllowAny()]
         elif self.action in ['list']:
-            return [IsAdmin()]  
+            return [IsAdminOrAnalyzer()]  
         elif self.action in ['update', 'partial_update', 'destroy']:
-            return [IsAuthenticated(), IsAdminOrSelf()]
+            return [ IsAdminOrAnalyzerOrSelf()]
         return [IsAuthenticated()]
 
     def get_serializer_class(self):
         """Restrict non-admin users to limited fields on update"""
         if self.action in ['update', 'partial_update']:
             user = self.request.user
-            if not (user.is_staff or user.role == "admin"):
+            if not ( user.role == "ADMIN" or user.role == "ANALYZER" ):
                 return UserRestrictedSerializer
         return super().get_serializer_class()
 
@@ -72,6 +75,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class VerifyOTPView(APIView):
     permission_classes = [AllowAny]
+    # throttle_classes = [IPBasedThrottle]
+    # throttle_scope = "otp"
 
     def post(self, request):
         serializer = VerifyOTPSerializer(data=request.data)
@@ -179,8 +184,6 @@ class ForgotPasswordRequestView(APIView):
         send_otp_via_email.delay(user.email)
 
         return Response({"message": "OTP sent to email"}, status=200)
-
-
 # Step 2: Verify OTP and issue temporary token
 class VerifyOTPForgotPasswordView(APIView):
     permission_classes = [AllowAny]

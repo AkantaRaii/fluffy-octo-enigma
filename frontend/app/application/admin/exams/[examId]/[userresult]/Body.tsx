@@ -14,9 +14,10 @@ interface Attempt {
 
 interface Props {
   attempt?: Attempt;
+  examTitle: string;
 }
 
-export default function Body({ attempt }: Props) {
+export default function Body({ attempt, examTitle }: Props) {
   if (!attempt) {
     return (
       <div className="max-w-3xl mx-auto py-6 text-center text-gray-500">
@@ -29,21 +30,22 @@ export default function Body({ attempt }: Props) {
     <div className="w-full p-4 md:p-6">
       {/* Download Button */}
       <div className="flex justify-end mb-4">
-        <DownloadReportButton attempt={attempt} />
+        <DownloadReportButton examTitle={examTitle} attempt={attempt} />
       </div>
 
-      {/* On-screen Report Preview (same as before) */}
-      <div className="space-y-4 bg-white p-4 rounded-lg shadow">
+      {/* On-screen Report Preview */}
+      <div className="space-y-6 bg-white p-4 md:p-6 rounded-lg shadow">
         {/* Summary */}
-        <div className="flex flex-row gap-4 justify-between">
-          <div className="mb-6 border border-gray-300 rounded-xl p-6 flex flex-col items-start shadow-sm w-full">
-            <h1 className="text-md font-bold mb-2 text-center">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* User Info */}
+          <div className="border border-gray-300 rounded-xl p-4 md:p-6 flex flex-col gap-2 shadow-sm flex-1">
+            <h1 className="text-sm md:text-md font-bold">
               Name:{" "}
               <span className="font-semibold text-gray-600">
                 {attempt.user.first_name + " " + attempt.user.last_name}
               </span>
             </h1>
-            <h1 className="text-md font-bold mb-2 text-center">
+            <h1 className="text-sm md:text-md font-bold">
               Email:{" "}
               <span className="font-semibold text-gray-600">
                 {attempt.user.email}
@@ -51,32 +53,39 @@ export default function Body({ attempt }: Props) {
             </h1>
           </div>
 
-          <div className="mb-6 border border-gray-300 rounded-xl p-6 shadow-sm w-full">
-            <h2 className="text-xl font-semibold mb-4">Exam Result</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          {/* Exam Result */}
+          <div className="border border-gray-300 rounded-xl p-4 md:p-6 shadow-sm flex-1">
+            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center md:text-left">
+              Exam Result
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               <div className="flex flex-col justify-center items-center">
-                <span className="font-semibold text-3xl">
+                <span className="font-semibold text-2xl md:text-3xl">
                   {attempt.total_questions}
                 </span>
-                <p className="text-gray-400">Total Questions</p>
+                <p className="text-gray-400 text-xs md:text-sm">
+                  Total Questions
+                </p>
               </div>
               <div className="flex flex-col justify-center items-center">
-                <span className="font-semibold text-theme text-3xl">
+                <span className="font-semibold text-theme text-2xl md:text-3xl">
                   {attempt.correct_answers}
                 </span>
-                <p className="text-gray-400">Correct</p>
+                <p className="text-gray-400 text-xs md:text-sm">Correct</p>
               </div>
               <div className="flex flex-col justify-center items-center">
-                <span className="font-semibold text-3xl">
+                <span className="font-semibold text-2xl md:text-3xl">
                   {attempt.total_marks}
                 </span>
-                <p className="text-gray-400">Total Marks</p>
+                <p className="text-gray-400 text-xs md:text-sm">Total Marks</p>
               </div>
               <div className="flex flex-col justify-center items-center">
-                <span className="font-semibold text-3xl">
+                <span className="font-semibold text-2xl md:text-3xl">
                   {attempt.obtained_marks}
                 </span>
-                <p className="text-gray-400">Marks Obtained</p>
+                <p className="text-gray-400 text-xs md:text-sm">
+                  Marks Obtained
+                </p>
               </div>
             </div>
           </div>

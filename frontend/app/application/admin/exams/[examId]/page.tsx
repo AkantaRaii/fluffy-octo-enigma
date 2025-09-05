@@ -1,19 +1,23 @@
+import { NextPage } from "next";
 import { Exam, ExamAttempt, ExamInvitation } from "@/types/Exam";
 import apiServer from "@/utils/axiosServer";
 import Body from "./components/Body";
-import { ExamQuestion, Question } from "@/types/QuestionOption";
+import { ExamQuestion } from "@/types/QuestionOption";
 import { Department } from "@/types/Depertment";
 import { format } from "date-fns";
-interface Props {
-  params: { examId: string };
+
+// Define the props type explicitly
+interface PageProps {
+  params: Promise<{ examId: string }>;
 }
-export default async function page({ params }: Props) {
-  //exam id from parameter
-  const examId = params.examId;
+
+// Use NextPage to type the component
+const Page: NextPage<PageProps> = async ({ params }: PageProps) => {
+  const { examId } = await params;
+
   const examRes = await apiServer.get(`/api/v1/exams/exams/${examId}/`);
   const exam: Exam = examRes.data;
 
-  //inv users ko list
   const examInvitationsRes = await apiServer.get(
     `/api/v1/exams/examinvitations/?exam=${examId}`
   );
@@ -24,21 +28,18 @@ export default async function page({ params }: Props) {
   );
   const examAttempts: ExamAttempt[] = examAttemptsRes.data;
 
-  //exam question ko list
   const examQuestionsRes = await apiServer.get(
     `/api/v1/exams/examquestions/?exam=${examId}`
   );
   const examQuestions: ExamQuestion[] = examQuestionsRes.data;
 
-  //department  list
   const departmentRes = await apiServer.get(`/api/v1/exams/departments/`);
   const departments: Department[] = departmentRes.data;
 
-  //jsx
   return (
-    <div className=" max-w-7xl py-2 ">
+    <div className="max-w-7xl py-2">
       {/* Exam Info Card */}
-      <div className=" mb-4">
+      <div className="mb-4">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Exam: <span className="text-theme">{exam.title}</span>
         </h1>
@@ -92,4 +93,6 @@ export default async function page({ params }: Props) {
       />
     </div>
   );
-}
+};
+
+export default Page;

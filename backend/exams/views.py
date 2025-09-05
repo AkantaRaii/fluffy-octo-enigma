@@ -48,7 +48,7 @@ class ExamViewSet(viewsets.ModelViewSet):
     filter_backends=[filters.SearchFilter,filters.OrderingFilter,DjangoFilterBackend]
     search_fields=['title','instructions']
     ordering_fields=['scheduled_start','duration_minutes']
-    permission_classes=[ExamPermission]
+    permission_classes=[IsAdminOrAnalyzerOrReadOnly]
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
 
@@ -346,12 +346,12 @@ class UserDashboardView(APIView):
 
 
 class AdminDashboardView(APIView):
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAdminOrAnalyzer]
 
     def get(self, request):
         user = request.user
-        if user.role != 'ADMIN':
-            return Response({"detail": "Unauthorized"}, status=403)
+        # if user.role != 'ADMIN' or user.role!='ANALYZER':
+        #     return Response({"detail": "Unauthorized"}, status=403)
 
         # Exams and users
         total_exams = Exam.objects.count()

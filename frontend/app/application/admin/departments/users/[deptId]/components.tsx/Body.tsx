@@ -6,11 +6,9 @@ interface Props {
   users: User[];
 }
 export default function Body({ users }: Props) {
-  const [deptUsers, setDeptUsers] = useState<User[]>(users);
-  const onDelete = () => {};
   return (
     <div>
-      <UserTable data={deptUsers} onEdit={() => {}} onDelete={() => {}} />
+      <UserTable data={users} />
     </div>
   );
 }

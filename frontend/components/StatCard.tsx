@@ -6,7 +6,7 @@ export default function StatCard({
   href,
 }: {
   title: string;
-  value: any;
+  value: string | number;
   href?: string;
 }) {
   return (

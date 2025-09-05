@@ -113,8 +113,13 @@ export default function ExamDashboard({
         console.log("Finalized exam:", examRes.data);
 
         router.push(`/application/user/upcoming/result/${examId}`);
-      } catch (err: any) {
-        console.error("Submit error:", err.response?.data || err.message);
+      } catch (err: unknown) {
+        if (err && typeof err === "object" && "response" in err) {
+          const e = err as { response?: { data?: unknown }; message?: string };
+          console.error("Submit error:", e.response?.data || e.message);
+        } else {
+          console.error("Submit error:", String(err));
+        }
       }
     } else {
       toast.error("Please answer all questions before submitting.");

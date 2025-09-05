@@ -9,12 +9,9 @@ import { useRouter } from "next/navigation";
 
 interface TableProps {
   data: User[];
-  onEdit?: (user: User) => void;
-  onDelete?: (user: User) => void;
 }
 
-export default function UserTable({ data, onEdit, onDelete }: TableProps) {
-  const router = useRouter();
+export default function UserTable({ data }: TableProps) {
   // Local state for users so we can update immediately
   const [users, setUsers] = useState<User[]>(data);
   const { showModal } = useModal();

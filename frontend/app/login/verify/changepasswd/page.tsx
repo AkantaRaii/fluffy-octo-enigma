@@ -74,7 +74,7 @@ export default function ChangePasswordPage() {
         router.push("/login");
       }
       toast.error("failed to change password");
-    } catch (err) {
+    } catch {
       toast.error("Failed to reset password. Try again.");
     } finally {
       setLoading(false);

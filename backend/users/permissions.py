@@ -47,3 +47,34 @@ class IsAdminOrAnalyzerOrReadOnly(BasePermission):
             request.user.is_authenticated and
             request.user.role in ["ADMIN", "ANALYZER"]
         )
+class IsSelfOrReadOnly(permissions.BasePermission):
+    """
+    - Normal user can only read their own data.
+    - Can only update allowed fields (first_name, last_name, phone_number).
+    - Can set department only on create.
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return obj == request.user  # can only read self
+        return obj == request.user
+    
+class IsAdminOrAnalyzerOrSelf(BasePermission):
+    """
+    - SAFE methods: any authenticated user can read
+    - ADMIN/ANALYZER: full write access
+    - USER: can only write to their own record
+    """
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        # Allow safe methods
+        if request.method in SAFE_METHODS:
+            return True
+
+        # Admin/Analyzer can write to anyone
+        if request.user.role in ["ADMIN", "ANALYZER"]:
+            return True
+
+        # Self can write to their own object only
+        return obj == request.user

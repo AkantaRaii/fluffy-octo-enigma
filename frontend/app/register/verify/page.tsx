@@ -22,8 +22,8 @@ export default function OtpPage() {
 
       // redirect or show success
       router.push("/login"); // or wherever you want
-    } catch (error: any) {
-      console.error(" OTP Verification failed:", error.response?.data || error);
+    } catch {
+      console.error(" OTP Verification failed:");
       toast.error("Invalid OTP. Please try again.");
     }
   };

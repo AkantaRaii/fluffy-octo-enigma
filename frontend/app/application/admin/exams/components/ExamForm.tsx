@@ -4,11 +4,22 @@ import { Department } from "@/types/Depertment";
 import { Exam } from "@/types/Exam";
 import { toLocalInputValue } from "@/utils/date";
 
+export interface ExamPayload {
+  title: string;
+  duration_minutes: number;
+  scheduled_start: string; // or Date
+  scheduled_end: string;   // or Date
+  department: number | null;
+  repeat_after_days: number | null;
+  instructions: string;
+  passing_score: number;
+}
+
 interface ExamFormProps {
   initialData?: Partial<Exam>;
   departments: Department[];
   onSubmit: (
-    payload: any,
+    payload: ExamPayload,
     options?: { addAllQuestions: boolean; addAllUsers: boolean }
   ) => Promise<void>;
   onCancel: () => void;
@@ -96,7 +107,7 @@ export default function ExamForm({
         </select>
       </div>
       {/* Duration */}
-      <div>
+      {/* <div>
         <label className="block text-sm font-medium text-gray-700">
           Duration (minutes)
         </label>
@@ -107,7 +118,7 @@ export default function ExamForm({
           min="1"
           className="mt-1 w-full border border-gray-300 rounded-lg p-2"
         />
-      </div>
+      </div> */}
       {/* Start / End */}
       <div>
         <label className="block text-sm font-medium text-gray-700">

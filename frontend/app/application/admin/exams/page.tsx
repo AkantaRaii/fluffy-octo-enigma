@@ -3,7 +3,7 @@ import { Exam } from "@/types/Exam";
 import ExamBody from "./ExamBody";
 import { Department } from "@/types/Depertment";
 
-export default async function () {
+export default async function Page() {
   const examRes = await fetchServer(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/exams/exams/`
   );
@@ -15,7 +15,7 @@ export default async function () {
 
   return (
     <div className="container mx-auto py-2">
-      <ExamBody examList={exams} departments={departments} />
+      <ExamBody examList={exams} departments={departments} /> 
     </div>
   );
 }

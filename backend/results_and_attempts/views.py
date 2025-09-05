@@ -19,8 +19,7 @@ class UserExamAttemptViewSet(viewsets.ModelViewSet):
     serializer_class = UserExamAttemptCreateSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['exam','user']
-    permission_classes = [IsAuthenticated]
-
+    permission_classes = [IsAuthenticated, IsAdminOrAnalyzerOrSelfAttempt]
     def get_queryset(self):
         user = self.request.user
         if user.role in ["ADMIN", "ANALYZER"]:

@@ -27,11 +27,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  if (
-    pathname.startsWith("/application/user") &&
-    !(role === "ADMIN" || role === "ANALYZER" || role === "USER")
-  ) {
-    // if (pathname.startsWith("/application/user") && !(role === "USER")) {
+  // if (
+  //   pathname.startsWith("/application/user") &&
+  //   !(role === "ADMIN" || role === "ANALYZER" || role === "USER")
+  // ) {
+  if (pathname.startsWith("/application/user") && !(role === "USER")) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 

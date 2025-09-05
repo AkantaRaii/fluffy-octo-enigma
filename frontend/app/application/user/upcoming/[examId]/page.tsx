@@ -2,14 +2,14 @@
 import { Exam, ExamInvitation } from "@/types/Exam";
 import StartExamLanding from "./StartExamLanding";
 import apiServer from "@/utils/axiosServer";
-import { auth } from "@/app/api/auth/[...nextauth]/route";
+import { auth } from "@/lib/auth";
 
 interface Props {
-  params: { examId: string };
+  params: Promise<{ examId: string }>;
 }
 
 export default async function Page({ params }: Props) {
-  const { examId } = params;
+  const { examId } = await params;
   const session = await auth();
   // console.log(session.user);
 
@@ -17,7 +17,7 @@ export default async function Page({ params }: Props) {
   const examRes = await apiServer(`/api/v1/exams/exams/${examId}/`);
   const exam: Exam = examRes.data;
   const examInvitationRes = await apiServer(
-    `/api/v1/exams/examinvitations/?user=${session.id}&exam=${exam.id}`
+    `/api/v1/exams/examinvitations/?user=${session?.id}&exam=${exam.id}`
   );
   const invitations: ExamInvitation[] = examInvitationRes.data;
   const examInvitation = invitations.length > 0 ? invitations[0] : null;

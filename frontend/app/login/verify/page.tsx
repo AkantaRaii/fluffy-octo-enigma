@@ -31,8 +31,8 @@ export default function OtpPage() {
       router.push(
         `/login/verify/changepasswd?token=${encodeURIComponent(token)}`
       ); // or wherever you want
-    } catch (error: any) {
-      console.error(" OTP Verification failed:", error.response?.data || error);
+    } catch {
+      console.error(" OTP Verification failed:");
       toast.error("Invalid OTP. Please try again.");
     }
   };

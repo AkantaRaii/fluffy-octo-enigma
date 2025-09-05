@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { Department } from "@/types/Depertment";
 import { Exam } from "@/types/Exam";
 import { X } from "lucide-react";
@@ -15,13 +14,24 @@ interface Props {
   departments: Department[];
 }
 
+export interface ExamPayload {
+  title: string;
+  duration_minutes: number;
+  scheduled_start: string; // or Date
+  scheduled_end: string;   // or Date
+  department: number | null;
+  repeat_after_days: number | null;
+  instructions: string;
+  passing_score: number;
+}
+
 export default function EditExam({
   exam,
   setEditExamForm,
   setExams,
   departments,
 }: Props) {
-  async function handleEdit(payload: any) {
+  async function handleEdit(payload: ExamPayload) {
     try {
       const res = await apiClient.put(
         `/api/v1/exams/exams/${exam.id}/`,

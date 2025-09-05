@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { Department } from "@/types/Depertment";
 import { Exam } from "@/types/Exam";
 import { X } from "lucide-react";
@@ -7,6 +6,16 @@ import { Dispatch, SetStateAction } from "react";
 import apiClient from "@/utils/axiosClient";
 import ExamForm from "./ExamForm";
 import toast from "react-hot-toast";
+export interface ExamPayload {
+  title: string;
+  duration_minutes: number;
+  scheduled_start: string; // or Date
+  scheduled_end: string; // or Date
+  department: number | null;
+  repeat_after_days: number | null;
+  instructions: string;
+  passing_score: number;
+}
 
 interface Props {
   setAddExamForm: (value: boolean) => void;
@@ -20,7 +29,7 @@ export default function AddExam({
   departments,
 }: Props) {
   async function handleAdd(
-    payload: any,
+    payload: ExamPayload,
     options?: { addAllQuestions: boolean; addAllUsers: boolean }
   ) {
     try {
@@ -36,13 +45,10 @@ export default function AddExam({
         const { addAllQuestions, addAllUsers } = options;
 
         if (addAllQuestions) {
-          const res = await apiClient.post(
-            "/api/v1/exams/examquestions/bulk_create/",
-            {
-              exam_id: exam.id,
-              department_id: payload.department,
-            }
-          );
+          await apiClient.post("/api/v1/exams/examquestions/bulk_create/", {
+            exam_id: exam.id,
+            department_id: payload.department,
+          });
         }
 
         if (addAllUsers) {

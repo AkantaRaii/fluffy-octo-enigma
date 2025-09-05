@@ -10,13 +10,22 @@ interface Props {
   handleAddQuestion: (question: Question) => Promise<void>;
   departments: Department[];
 }
-
+export interface QuestionPayload {
+  departments: number[];
+  text: string;
+  marks: number;
+  type: "MCQ_SINGLE" | "MCQ_MULTI";
+  options: {
+    text: string;
+    is_correct: boolean | number; // matches your backend shape
+  }[];
+}
 export default function AddQuestion({
   setAddQuestionForm,
   handleAddQuestion,
   departments,
 }: Props) {
-  const onSubmit = async (payload: any) => {
+  const onSubmit = async (payload: QuestionPayload) => {
     try {
       // if you want to first create a new Question in backend
       const res = await apiClient.post(

@@ -3,13 +3,11 @@ import { User } from "@/types/User";
 import { Department } from "@/types/Depertment";
 import Body from "./components/Body";
 interface Props {
-  params: {
-    deptId: string;
-  };
+  params: Promise<{ deptId: string }>;
 }
 
 export default async function Page({ params }: Props) {
-  const deptId = params.deptId;
+  const { deptId } = await params;
   let users: User[] = [];
   let department: Department | null = null;
   try {
