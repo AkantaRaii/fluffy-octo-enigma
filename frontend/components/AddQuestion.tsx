@@ -4,12 +4,14 @@ import { Department } from "@/types/Depertment";
 import { Question } from "@/types/QuestionOption";
 import QuestionForm from "./QuestionForm";
 import apiClient from "@/utils/axiosClient";
+import toast from "react-hot-toast";
 
 interface Props {
   setAddQuestionForm: (value: boolean) => void;
   handleAddQuestion: (question: Question) => Promise<void>;
   departments: Department[];
 }
+
 export interface QuestionPayload {
   departments: number[];
   text: string;
@@ -20,26 +22,68 @@ export interface QuestionPayload {
     is_correct: boolean | number; // matches your backend shape
   }[];
 }
+
 export default function AddQuestion({
   setAddQuestionForm,
   handleAddQuestion,
   departments,
 }: Props) {
   const onSubmit = async (payload: QuestionPayload) => {
+    // ✅ Validation checks
+    if (!payload.text || payload.text.trim().length < 5) {
+      toast.error("Question text must be at least 5 characters long.");
+      return;
+    }
+    if (payload.marks <= 0) {
+      toast.error("Marks must be greater than 0.");
+      return;
+    }
+    if (!payload.departments.length) {
+      toast.error("Please select at least one department.");
+      return;
+    }
+    if (!payload.options.length) {
+      toast.error("Please add at least one option.");
+      return;
+    }
+    if (payload.type === "MCQ_SINGLE") {
+      const correctCount = payload.options.filter(
+        (opt) => opt.is_correct
+      ).length;
+      if (correctCount !== 1) {
+        toast.error(
+          "Single choice question must have exactly one correct option."
+        );
+        return;
+      }
+    }
+    if (payload.type === "MCQ_MULTI") {
+      const correctCount = payload.options.filter(
+        (opt) => opt.is_correct
+      ).length;
+      if (correctCount < 2) {
+        toast.error(
+          "Multiple choice question must have at least two correct options."
+        );
+        return;
+      }
+    }
+
     try {
-      // if you want to first create a new Question in backend
+      toast.success("Adding question...");
       const res = await apiClient.post(
         "/api/v1/exams/questionswithoptions/",
         payload
       );
       const newQuestion = res.data as Question;
 
-      // then link it to the current exam
       await handleAddQuestion(newQuestion);
 
+      toast.success("Question added successfully!");
       setAddQuestionForm(false);
     } catch (err) {
       console.error("Error adding question:", err);
+      toast.error("Failed to add question. Please try again.");
     }
   };
 
