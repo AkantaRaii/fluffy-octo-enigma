@@ -64,3 +64,6 @@ logs/
 
 # Ju
 /env
+*.bak
+*.dat
+*.dir

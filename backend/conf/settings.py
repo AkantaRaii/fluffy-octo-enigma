@@ -149,32 +149,33 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
-    # ,"DEFAULT_THROTTLE_CLASSES": [
-    #     "rest_framework.throttling.AnonRateThrottle",
-    #     "rest_framework.throttling.UserRateThrottle",
-    #     "rest_framework.throttling.ScopedRateThrottle",
-    # ],
-    # "DEFAULT_THROTTLE_RATES": {
-    #     #  Auth & OTP
-    #     "anon": "100/hour",  
-    #     "login": "5/min",
-    #     "otp": "5/min",
-    #     "forgot_password": "3/min",
-    #     "check_email": "10/min",
+    ,"DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        #  Auth & OTP
+        "anon": "100/hour",
+        "user":"100/min"  ,
+        "login": "5/min",
+        "otp": "5/min",
+        "forgot_password": "3/min",
+        "check_email": "10/min",
 
-    #     #  Exam Flow
-    #     "exam_start": "3/min",
-    #     "attempts": "2/min",
-    #     "responses": "60/min",
-    #     "results": "5/min",
+        #  Exam Flow
+        "exam_start": "3/min",
+        "attempts": "2/min",
+        "responses": "60/min",
+        "results": "5/min",
 
-    #     #  Dashboards
-    #     "dashboard_user": "30/min",
-    #     "dashboard_admin": "10/min",
+        #  Dashboards
+        "dashboard_user": "30/min",
+        "dashboard_admin": "10/min",
 
-    #     # General
-    #     "general": "100/min",
-    # },
+        # General
+        "general": "100/min",
+    },
 }
 
 

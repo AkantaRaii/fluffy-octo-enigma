@@ -14,7 +14,7 @@ from datetime import  timedelta
 import jwt
 from exams.models import Department
 from .permissions import *
-# from .throttles import IPBasedThrottle
+from .throttles import IPBasedThrottle
 # Create your views here.
 
 class Me(APIView):
@@ -32,8 +32,8 @@ class Me(APIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-    # throttle_classes = [IPBasedThrottle]
-    # throttle_scope = "login"
+    throttle_classes = [IPBasedThrottle]
+    throttle_scope = "login"
 
 # users/views.py
 class UserViewSet(viewsets.ModelViewSet):
@@ -75,8 +75,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class VerifyOTPView(APIView):
     permission_classes = [AllowAny]
-    # throttle_classes = [IPBasedThrottle]
-    # throttle_scope = "otp"
+    throttle_classes = [IPBasedThrottle]
+    throttle_scope = "otp"
 
     def post(self, request):
         serializer = VerifyOTPSerializer(data=request.data)
