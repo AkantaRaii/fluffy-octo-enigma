@@ -356,7 +356,7 @@ class AdminDashboardView(APIView):
         # Exams and users
         total_exams = Exam.objects.count()
         active_exams = Exam.objects.filter(is_active=True).count()
-        total_users = User.objects.count()
+        total_users = User.objects.filter(otp_verified=True).count()
 
         # Pass rate calculation
         submitted_attempts = UserExamAttempt.objects.filter(is_submitted=True)

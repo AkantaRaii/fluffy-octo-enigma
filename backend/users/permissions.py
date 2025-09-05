@@ -40,7 +40,7 @@ class IsAdminOrAnalyzerOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         # Allow safe methods for any authenticated user
         if request.method in SAFE_METHODS:
-            return request.user.is_authenticated
+            return True
         
         # Allow write methods only for Admin or Analyzer
         return (
