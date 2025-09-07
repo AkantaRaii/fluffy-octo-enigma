@@ -70,8 +70,10 @@ class UserSerializer(serializers.ModelSerializer):
 class VerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField(max_length=6)
-
-
+    def validate_otp(self, value):
+      if not value.isdigit() or len(value) != 6:   # assuming 6-digit OTP
+          raise serializers.ValidationError("OTP must be a 6-digit number.")
+      return value
 class ResetPasswordRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 

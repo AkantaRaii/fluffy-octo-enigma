@@ -54,8 +54,20 @@ export const authOptions: NextAuthOptions = {
           return null;
         } catch (err: unknown) {
           if (axios.isAxiosError(err)) {
-            const message = err.response?.data?.detail || "Login failed";
-            throw new Error(message);
+            const status = err.response?.status;
+            const message =
+              err.response?.data?.detail ||
+              (status === 401
+                ? "Invalid credentials"
+                : status === 403
+                ? "Account forbidden"
+                : "Login failed");
+
+            // return null for 401 (invalid creds)
+            if (status === 401) return null;
+
+            // throw for others (NextAuth -> ?error=...)
+            throw new Error(`${status}:${message}`);
           }
           throw new Error("Unexpected error occurred");
         }

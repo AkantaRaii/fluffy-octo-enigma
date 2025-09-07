@@ -29,9 +29,16 @@ export default function InputField() {
         password,
         callbackUrl,
       });
-
+      console.log(response);
       if (response?.error) {
-        toast.error("Invalid credentials");
+        const [status, message] = response.error.split(":");
+        if (status === "400") {
+          toast.error(
+            "Your account is not yet verified. Please wait for admin approval."
+          );
+        } else {
+          toast.error("Login failed. Please try again.");
+        }
       } else {
         toast.success("Logged in successfully!");
         router.push(callbackUrl);

@@ -75,7 +75,11 @@ export default function DepartmentModal({
             onClick={() => setOpen(false)}
             className="p-2 rounded-md bg-gray-500"
           >
-            <X className="text-white" width={14} height={14} />
+            <X
+              className="cursor-pointer opacity-70 text-white"
+              width={14}
+              height={14}
+            />
           </button>
         </div>
 

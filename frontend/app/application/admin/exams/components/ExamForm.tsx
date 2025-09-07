@@ -3,12 +3,12 @@ import { useState, FormEvent } from "react";
 import { Department } from "@/types/Depertment";
 import { Exam } from "@/types/Exam";
 import { toLocalInputValue } from "@/utils/date";
-
+import { toast } from "react-hot-toast";
 export interface ExamPayload {
   title: string;
   duration_minutes: number;
   scheduled_start: string; // or Date
-  scheduled_end: string;   // or Date
+  scheduled_end: string; // or Date
   department: number | null;
   repeat_after_days: number | null;
   instructions: string;
@@ -56,6 +56,33 @@ export default function ExamForm({
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const now = new Date();
+    if (!title.trim()) {
+      toast.error("Exam title is required.");
+      return;
+    }
+
+    if (!department) {
+      toast.error("Please select a department.");
+      return;
+    }
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      toast.error("Please provide both start and end date.");
+      return;
+    }
+
+    if (startDate <= now) {
+      toast.error("Start time must be in the future.");
+      return;
+    }
+
+    if (endDate <= startDate) {
+      toast.error("End time must be after the start time.");
+      return;
+    }
     const payload = {
       title,
       duration_minutes: duration,

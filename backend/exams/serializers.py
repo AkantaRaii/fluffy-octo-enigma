@@ -46,14 +46,37 @@ class OptionSerializers(serializers.ModelSerializer):
         fields='__all__'
         read_only_fields = ['question']
 class ExamSerializers(serializers.ModelSerializer):
-    creator_email=serializers.EmailField(source='creator.email',read_only=True)
-    department_name=serializers.CharField(source='department.name',read_only=True)
+    creator_email = serializers.EmailField(source='creator.email', read_only=True)
+    department_name = serializers.CharField(source='department.name', read_only=True)
+
     class Meta:
-        model=Exam
-        fields=['id','title','department','department_name','creator','creator_email','duration_minutes','scheduled_start','scheduled_end','repeat_after_days','is_active','instructions','celery_task_id','passing_score']
-        read_only_fields=['creator']
+        model = Exam
+        fields = [
+            'id', 'title', 'department', 'department_name',
+            'creator', 'creator_email',
+            'duration_minutes', 'scheduled_start', 'scheduled_end',
+            'repeat_after_days', 'is_active', 'instructions',
+            'celery_task_id', 'passing_score'
+        ]
+        read_only_fields = ['creator']
 
+    def validate(self, data):
+        scheduled_start = data.get('scheduled_start') or getattr(self.instance, 'scheduled_start', None)
+        scheduled_end = data.get('scheduled_end') or getattr(self.instance, 'scheduled_end', None)
 
+        if scheduled_start and scheduled_end:
+            if scheduled_start >= scheduled_end:
+                raise serializers.ValidationError(
+                    {"scheduled_end": "End time must be after start time."}
+                )
+
+        if scheduled_start:
+            if scheduled_start <= timezone.now():
+                raise serializers.ValidationError(
+                    {"scheduled_start": "Start time must be in the future."}
+                )
+
+        return data
 
 class OptionNestedSerializer(serializers.ModelSerializer):
     class Meta:

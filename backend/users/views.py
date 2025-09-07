@@ -93,13 +93,18 @@ class VerifyOTPView(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not user.otp or user.otp_expiry < timezone.now():
+        # Check OTP existence and expiry
+        if not user.otp or not user.otp_expiry or user.otp_expiry < timezone.now():
             return Response({"error": "OTP expired"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Check OTP match
         if user.otp != otp:
             return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Success: mark verified and reset OTP
         user.otp_verified = True
+        user.otp = None            # reset OTP
+        user.otp_expiry = None     # reset expiry
         user.save()
 
         return Response({"message": "OTP verified successfully"}, status=status.HTTP_200_OK)
@@ -136,25 +141,32 @@ class VerifyOTPForgotPasswordView(APIView):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=400)
+            return Response({"error": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not user.otp or user.otp_expiry < timezone.now():
-            return Response({"error": "OTP expired"}, status=400)
+        # Check OTP existence and expiry
+        if not user.otp or not user.otp_expiry or user.otp_expiry < timezone.now():
+            return Response({"error": "OTP expired"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Check OTP match
         if user.otp != otp:
-            return Response({"error": "Invalid OTP"}, status=400)
+            return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
-  
+        # Success: reset OTP and expiry
+        user.otp = None
+        user.otp_expiry = None
+        user.save(update_fields=["otp", "otp_expiry"])
+
+        # Generate temporary token valid for 5 minutes
         temp_token = jwt.encode(
             {
                 "email": email,
-                "exp": (timezone.now() + timedelta(minutes=5)).timestamp()
+                "exp": int((timezone.now() + timedelta(minutes=5)).timestamp())
             },
             settings.SECRET_KEY,
             algorithm="HS256"
         )
 
-        return Response({"message": "OTP verified", "temp_token": temp_token}, status=200)
+        return Response({"message": "OTP verified", "temp_token": temp_token}, status=status.HTTP_200_OK)
 
 
 # users/views.py
@@ -167,60 +179,6 @@ import jwt
 from django.conf import settings
 from .models import User
 from .serialzers import *
-
-# Step 1: Request password reset (send OTP)
-class ForgotPasswordRequestView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        serializer = ResetPasswordRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['email']
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=400)
-
-        # Send OTP in background (Celery task)
-        from .tasks import send_otp_via_email
-        send_otp_via_email.delay(user.email)
-
-        return Response({"message": "OTP sent to email"}, status=200)
-# Step 2: Verify OTP and issue temporary token
-class VerifyOTPForgotPasswordView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        serializer = VerifyOTPSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        email = serializer.validated_data['email']
-        otp = serializer.validated_data['otp']
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=400)
-
-        if not user.otp or user.otp_expiry < timezone.now():
-            return Response({"error": "OTP expired"}, status=400)
-
-        if user.otp != otp:
-            return Response({"error": "Invalid OTP"}, status=400)
-
-        # Issue temporary JWT token (5 minutes)
-        temp_token = jwt.encode(
-            {
-                "email": email,
-                "exp": (timezone.now() + timedelta(minutes=5)).timestamp()
-            },
-            settings.SECRET_KEY,
-            algorithm="HS256"
-        )
-
-        return Response({"message": "OTP verified", "temp_token": temp_token}, status=200)
-
 
 # Step 3: Confirm password reset using temp token
 class ForgotPasswordConfirmView(APIView):

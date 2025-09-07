@@ -37,10 +37,12 @@ export default function DeleteDepartment({
 
       <div className="fixed right-0 top-0 w-full max-w-md bg-white h-full shadow-lg z-50 animate-slideIn flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-md font-semibold text-red-600">Delete Department</h2>
+          <h2 className="text-md font-semibold text-red-600">
+            Delete Department
+          </h2>
           <button
             onClick={() => setDeleteDeptForm(false)}
-            className="p-2 rounded-md bg-gray-500"
+            className="p-2 rounded-md bg-gray-500 cursor-pointer opacity-70"
           >
             <X className="text-white" width={14} height={14} />
           </button>
@@ -56,13 +58,13 @@ export default function DeleteDepartment({
             <button
               type="button"
               onClick={() => setDeleteDeptForm(false)}
-              className="px-4 py-2 rounded-md bg-gray-200"
+              className="px-4 py-2 rounded-md bg-gray-200 cursor-pointer opacity-70"
             >
               Cancel
             </button>
             <button
               onClick={handleDelete}
-              className="px-4 py-2 rounded-md bg-red-600 text-white"
+              className="px-4 py-2 rounded-md bg-red-600 text-white cursor-pointer opacity-70"
             >
               Delete
             </button>
