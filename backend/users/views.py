@@ -37,27 +37,31 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 # users/views.py
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.filter(otp_verified=True)
     serializer_class = UserSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['first_name', 'last_name', 'email']
     ordering_fields = ['id', 'first_name', 'last_name', 'email', 'role']
     filterset_fields = ['department']
-    permission_classes=[IsAdmin]
+    permission_classes = [AllowAny]  # fallback for unauthenticated users
+
+    def get_queryset(self):
+        if self.action in ['list', 'retrieve']:
+            return User.objects.filter(otp_verified=True)  # only verified users for reading
+        return User.objects.all()  # allow create/update without otp_verified filter
+
     def get_permissions(self):
         if self.action == 'create':
-            return [AllowAny()]
+            return [AllowAny()]  # ✅ open registration
         elif self.action in ['list']:
-            return [IsAdminOrAnalyzer()]  
+            return [IsAdminOrAnalyzer()]  # only admin/analyzer can list
         elif self.action in ['update', 'partial_update', 'destroy']:
-            return [ IsAdminOrAnalyzerOrSelf()]
+            return [IsAuthenticated(), IsAdminOrAnalyzerOrSelf()]
         return [IsAuthenticated()]
-
     def get_serializer_class(self):
-        """Restrict non-admin users to limited fields on update"""
+        """Use restricted serializer for non-admins on updates"""
         if self.action in ['update', 'partial_update']:
             user = self.request.user
-            if not ( user.role == "ADMIN" or user.role == "ANALYZER" ):
+            if not (user.role in ["ADMIN", "ANALYZER"]):
                 return UserRestrictedSerializer
         return super().get_serializer_class()
 
@@ -71,7 +75,6 @@ class UserViewSet(viewsets.ModelViewSet):
             "message": "Registration successful, OTP sent to email",
             "data": response.data
         }, status=status.HTTP_201_CREATED)
-
 
 class VerifyOTPView(APIView):
     permission_classes = [AllowAny]

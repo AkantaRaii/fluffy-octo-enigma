@@ -32,6 +32,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 # users/serializers.py
 class UserSerializer(serializers.ModelSerializer):
     department_name = serializers.CharField(source="department.name", read_only=True)
+    password = serializers.CharField(write_only=True, required=True)  # ✅ added
 
     class Meta:
         model = User
@@ -40,12 +41,31 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "first_name",
             "last_name",
-            "role",
-            "phone",
+            "password",
             "is_verified",
             "department",
             "department_name",
         ]
+        extra_kwargs = {
+            "password": {"write_only": True},  # don’t expose password in GET
+        }
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        user = User(**validated_data)
+        user.set_password(password)  # ✅ hashes the password
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if password:
+            instance.set_password(password)  # ✅ rehash on update
+        instance.save()
+        return instance
+
 
 class VerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()

@@ -126,6 +126,7 @@ export default function RegisterForm({ departments }: Props) {
       last_name: form.lastName,
       department: form.department,
     };
+    console.log(payload)
     const res = await apiClient.post("/api/v1/auth/users/", payload);
     const responseData = res.data;
     if (res.status !== 201) {

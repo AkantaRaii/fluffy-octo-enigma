@@ -9,7 +9,7 @@ from .utils import create_repeated_exam
 from django.utils import timezone
 from datetime import timedelta
 from results_and_attempts.models import UserExamAttempt 
-
+from django.db.models import Q
 logger = logging.getLogger(__name__)
 
 @shared_task
@@ -72,8 +72,7 @@ def create_repeated_exams():
         next_start = exam.scheduled_start + timedelta(minutes=3)
         next_end = exam.scheduled_end + timedelta(minutes=3)
 
-        failed = UserExamAttempt.objects.filter(exam=exam, status="failed")
-
+        failed = UserExamAttempt.objects.filter(Q(exam=exam) & (Q(status="failed") | Q(status="not_attempted")))
         exists = Exam.objects.filter(
             parent_exam=exam,
             scheduled_start=next_start

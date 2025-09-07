@@ -1,19 +1,19 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { toast } from "react-toastify";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff } from "lucide-react";
 import apiClient from "@/utils/axiosClient";
-import { AxiosError } from "axios";
+import toast from "react-hot-toast";
 export default function InputField() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [forgotMode, setForgotMode] = useState(false); // toggle login/reset
+  const [forgotMode, setForgotMode] = useState(false);
   const router = useRouter();
 
   const callbackUrl = searchParams.get("callbackUrl") || "/";
@@ -30,11 +30,11 @@ export default function InputField() {
         callbackUrl,
       });
 
-      if (response?.ok) {
+      if (response?.error) {
+        toast.error("Invalid credentials");
+      } else {
         toast.success("Logged in successfully!");
         router.push(callbackUrl);
-      } else {
-        toast.error(response?.error || "Invalid credentials");
       }
     } catch (error) {
       toast.error("Login failed. Please try again.");
@@ -61,6 +61,8 @@ export default function InputField() {
       if (res.status === 200) {
         toast.success(res.data.message); // optional
         router.push(`/login/verify?email=${encodeURIComponent(email)}`);
+      } else {
+        toast.error("Login failed. Please try again.");
       }
     } catch (error) {
       console.error(error);

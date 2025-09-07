@@ -20,12 +20,14 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count, Avg, Sum,Q  # add others if needed
 from users.permissions import * 
 from .permissions import *
+from rest_framework.permissions import AllowAny
+
 # Create your views here.
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset=Department.objects.all()
-    permission_classes=[IsAdminOrAnalyzerOrReadOnly]
     serializer_class=DepartmentSerializers
-    # permission_classes=[permissions.IsAuthenticated]
+
+    permission_classes=[AllowAny]
     
 
 class QuestionViewSet(viewsets.ModelViewSet):
